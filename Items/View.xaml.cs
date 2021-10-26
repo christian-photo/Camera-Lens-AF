@@ -12,7 +12,7 @@
 using System.ComponentModel.Composition;
 using System.Windows;
 
-namespace LenseAF.Items {
+namespace LensAF.Items {
 
     [Export(typeof(ResourceDictionary))]
     public partial class View : ResourceDictionary {

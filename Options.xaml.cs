@@ -12,7 +12,7 @@
 using System.ComponentModel.Composition;
 using System.Windows;
 
-namespace LenseAF {
+namespace LensAF {
 
     [Export(typeof(ResourceDictionary))]
     partial class Options : ResourceDictionary {

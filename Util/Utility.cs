@@ -14,7 +14,7 @@ using NINA.Core.Utility;
 using System;
 using System.Collections.Generic;
 
-namespace LenseAF.Util
+namespace LensAF.Util
 {
     public class Utility
     {

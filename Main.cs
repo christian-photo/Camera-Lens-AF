@@ -13,7 +13,7 @@ using NINA.Plugin;
 using NINA.Plugin.Interfaces;
 using System.ComponentModel.Composition;
 
-namespace LenseAF
+namespace LensAF
 {
     [Export(typeof(IPluginManifest))]
     public class Main : PluginBase
