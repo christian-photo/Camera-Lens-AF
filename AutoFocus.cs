@@ -38,14 +38,14 @@ namespace LensAF
         public async Task<AutoFocusResult> RunAF(IntPtr canon, ICameraMediator camera, IImagingMediator imaging, AutoFocusSettings settings)
         {
             bool Focused = false;
-            bool TooClose = false;
-            bool TooFar = false;
             const int near = (int)EDSDK.EvfDriveLens_Near2;
             const int far = (int)EDSDK.EvfDriveLens_Far2;
             int iteration = 0;
             List<FocusPoint> FocusPoints = new List<FocusPoint>();
             try
             {
+                CalibrateLens(camera, canon);
+
                 // Needed Variables
                 CancellationTokenSource cts = new CancellationTokenSource();
 
@@ -68,26 +68,8 @@ namespace LensAF
                     }
 
                     // Drive Focus
-                    if (iteration == 0)
-                    {
-                        EDSDK.EdsSendCommand(canon, EDSDK.CameraCommand_DriveLensEvf, far);
-                    }
-                    else if (iteration == 1)
-                    {
-                        EDSDK.EdsSendCommand(canon, EDSDK.CameraCommand_DriveLensEvf, near);
-                    }
-                    else
-                    {
-                        if (TooFar)
-                        {
-                            EDSDK.EdsSendCommand(canon, EDSDK.CameraCommand_DriveLensEvf, near);
-                        }
-                        else
-                        {
-                            EDSDK.EdsSendCommand(canon, EDSDK.CameraCommand_DriveLensEvf, far);
-                        }
-                        Logger.Trace($"Moving Focus... iteration {iteration}");
-                    }
+                    DriveFocus(canon, near);
+                    Logger.Trace($"Moving Focus... iteration {iteration}");
 
                     // Download and Prepare Image
                     IExposureData data = await imaging.CaptureImage(new CaptureSequence(
@@ -104,29 +86,12 @@ namespace LensAF
                     IStarDetectionAnalysis detection = image.RawImageData.StarDetectionAnalysis;
                     FocusPoints.Add(new FocusPoint(detection));
 
-                    if (iteration == 1)
+                    // Check if focused
+                    if (iteration >= 1)
                     {
-                        if (FocusPoints[1].HFR > FocusPoints[0].HFR)
+                        if (detection.HFR > FocusPoints[FocusPoints.Count - 2].HFR)
                         {
-                            TooClose = true;
-                        }
-                        else
-                        {
-                            TooFar = true;
-                        }
-                    }
-
-                    // Determine if focused
-                    if (iteration > 1)
-                    {
-                        if (TooFar && detection.HFR > FocusPoints[FocusPoints.Count - 2].HFR)
-                        {
-                            EDSDK.EdsSendCommand(canon, EDSDK.CameraCommand_DriveLensEvf, far);
-                            Focused = true;
-                        }
-                        else if (TooClose && detection.HFR > FocusPoints[FocusPoints.Count - 2].HFR)
-                        {
-                            EDSDK.EdsSendCommand(canon, EDSDK.CameraCommand_DriveLensEvf, near);
+                            DriveFocus(canon, far);
                             Focused = true;
                         }
                     }
@@ -146,6 +111,35 @@ namespace LensAF
             }
             LastAF = DateTime.Now;
             return new AutoFocusResult(Focused, FocusPoints);
+        }
+
+        private void DriveFocus(IntPtr cam, int direction)
+        {
+            EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, direction);
+            Thread.Sleep(500);
+        }
+
+        private void CalibrateLens(ICameraMediator cam, IntPtr ptr)
+        {
+            CancellationTokenSource t = new CancellationTokenSource();
+            cam.LiveView(t.Token).ForEachAsync(async _ =>
+            {
+                int i = 0;
+                while (true)
+                {
+                    EDSDK.EdsSendCommand(ptr, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
+                    Thread.Sleep(750);
+                    Logger.Info(i.ToString());
+                    i++;
+                    if (i == 5)
+                    {
+                        EDSDK.EdsSendCommand(ptr, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                        Thread.Sleep(750); // Let Focus Settle, EDSDK does not wait for the lens to finish moving the focus
+                        break;
+                    }
+                }
+                t.Cancel();
+            });
         }
     }
 

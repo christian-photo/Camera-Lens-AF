@@ -24,6 +24,8 @@ using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using LensAF.Util;
+using EDSDKLib;
+using Dasync.Collections;
 
 namespace LensAF.Items
 {
