@@ -12,7 +12,8 @@
     xmlns:local="clr-namespace:LensAF.Items"
     xmlns:viewmodel="clr-namespace:LensAF.Items"
     xmlns:mini="clr-namespace:NINA.View.Sequencer.MiniSequencer;assembly=NINA.Sequencer"
-    xmlns:nina="clr-namespace:NINA.View.Sequencer;assembly=NINA.Sequencer">
+    xmlns:nina="clr-namespace:NINA.View.Sequencer;assembly=NINA.Sequencer"
+    xmlns:ninactrl="clr-namespace:NINACustomControlLibrary;assembly=NINACustomControlLibrary">
     <GeometryGroup x:Key="Plugin_SVG">
         <PathGeometry Figures="M121.492 117.153c-48.661 0-86.78 60.987-86.78 138.847s38.119 138.847 86.78 138.847    c48.661 0 86.78-60.987 86.78-138.847S170.153 117.153 121.492 117.153z M121.492 377.492c-37.636 0-69.424-55.635-69.424-121.492    s31.788-121.492 69.424-121.492S190.915 190.144 190.915 256S159.127 377.492 121.492 377.492z" FillRule="NonZero"/>
         <PathGeometry Figures="M401.093 108.475h-53.339c-18.661-11.004-39.612-17.356-61.839-17.356H219.97c-11.89-5.569-24.555-8.678-37.733-8.678    h-52.068c-0.814 0-1.544 0.253-2.29 0.463c-2.129-0.16-4.231-0.463-6.388-0.463C54.5 82.441 0 160.301 0 256    s54.5 173.559 121.492 173.559c2.157 0 4.258-0.303 6.388-0.463c0.746 0.21 1.477 0.463 2.29 0.463h52.068    c13.178 0 25.843-3.109 37.733-8.678h65.945c22.227 0 43.178-6.352 61.839-17.356h53.339C462.246 403.525 512 337.347 512 256    S462.246 108.475 401.093 108.475z M121.492 412.203c-57.424 0-104.136-70.072-104.136-156.203S64.068 99.797 121.492 99.797    c57.424 0 104.136 70.072 104.136 156.203S178.915 412.203 121.492 412.203z M215.699 403.778c-1.881 0.283-3.619 1.019-4.9 2.309    c-9.091 3.898-18.648 6.116-28.561 6.116h-8.14c40.684-28.081 68.886-87.449 68.886-156.203s-28.201-128.123-68.886-156.203h8.14    c9.913 0 19.47 2.218 28.561 6.117c1.282 1.289 3.019 2.025 4.9 2.308c41.036 20.97 70.674 79.22 70.674 147.778    S256.735 382.807 215.699 403.778z M285.915 403.525h-39.996C280.54 372.91 303.729 318.319 303.729 256    s-23.189-116.91-57.809-147.525h39.996c67.246 0 121.949 66.178 121.949 147.525S353.161 403.525 285.915 403.525z     M401.093 386.169h-29.989C403.955 355.98 425.22 308.926 425.22 256s-21.265-99.98-54.116-130.169h29.989    c51.585 0 93.551 58.394 93.551 130.169S452.678 386.169 401.093 386.169z" FillRule="NonZero"/>
@@ -34,7 +35,7 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
-    <DataTemplate DataType="{x:Type local:LensAFInstruction}">
+    <DataTemplate DataType="{x:Type local:AFInstruction}">
         <nina:SequenceBlockView DataContext="{Binding}">
             <nina:SequenceBlockView.SequenceItemContent>
                 <StackPanel Orientation="Horizontal">
@@ -44,22 +45,68 @@
                     
                     <TextBlock Text="  |  Rescan for Cameras -> "
                                VerticalAlignment="Center"/>
-                    
+
                     <Button Width="26"
                             Height="26"
                             Command="{Binding Path=Reload}">
-                        
+
                         <Image Source="{StaticResource reload}" Margin="2,2,2,2"/>
-                    
+
+                    </Button>
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:AFAfterExposures}">
+        <nina:SequenceBlockView DataContext="{Binding}">
+            <nina:SequenceBlockView.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+
+                    <ComboBox ItemsSource="{Binding Cams, Mode=OneWay}"
+                              SelectedIndex="{Binding Index, Mode=TwoWay}"/>
+
+                    <TextBlock Text="  |  Rescan for Cameras -> "
+                               VerticalAlignment="Center"/>
+
+                    <Button Width="26"
+                            Height="26"
+                            Command="{Binding Path=Reload}">
+
+                        <Image Source="{StaticResource reload}" Margin="2,2,2,2"/>
+
                     </Button>
 
-                    <TextBlock Text="  |  Stretch factor"
-                               Margin="10,0,5,0"
+                    <TextBlock Text="  |  Amount "
                                VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding Path=StretchFactor}"
-                             Width="60"
-                             Height="25"/>
+                    <TextBox Text="{Binding AfterExposures, Mode=TwoWay}" Width="50" VerticalAlignment="Center"/>
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
 
+    <DataTemplate DataType="{x:Type local:AFAfterTime}">
+        <nina:SequenceBlockView DataContext="{Binding}">
+            <nina:SequenceBlockView.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+
+                    <ComboBox ItemsSource="{Binding Cams, Mode=OneWay}"
+                              SelectedIndex="{Binding Index, Mode=TwoWay}"/>
+
+                    <TextBlock Text="  |  Rescan for Cameras -> "
+                               VerticalAlignment="Center"/>
+
+                    <Button Width="26"
+                            Height="26"
+                            Command="{Binding Path=Reload}">
+
+                        <Image Source="{StaticResource reload}" Margin="2,2,2,2"/>
+
+                    </Button>
+
+                    <TextBlock Text="  |  Amount "
+                               VerticalAlignment="Center"/>
+                    <ninactrl:UnitTextBox Text="{Binding AfterTime, Mode=TwoWay}" Width="50" VerticalAlignment="Center" Unit="min"/>
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemContent>
         </nina:SequenceBlockView>

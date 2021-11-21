@@ -9,19 +9,21 @@
 
 #endregion "copyright"
 
-using System.ComponentModel;
+using NINA.Core;
+using NINA.Core.Utility;
+using NINA.Plugin;
+using NINA.Plugin.Interfaces;
 using System.ComponentModel.Composition;
-using System.Windows;
 
-namespace LensAF 
+namespace LensAF
 {
-
-    [Export(typeof(ResourceDictionary))]
-    partial class Options : ResourceDictionary
+    [Export(typeof(IPluginManifest))]
+    public class LensAF : PluginBase
     {
-        public Options() 
+        [ImportingConstructor]
+        public LensAF() 
         {
-            InitializeComponent();
+            
         }
     }
 }

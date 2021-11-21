@@ -33,15 +33,17 @@ namespace LensAF.Util
             List<IntPtr> cams = new List<IntPtr>();
             try
             {
-                uint err = EDSDK.EdsGetCameraList(out IntPtr cameraList);
+                IntPtr devices;
+                uint err = EDSDK.EdsGetCameraList(out devices);
                 if (err == EDSDK.EDS_ERR_OK)
                 {
-                    err = EDSDK.EdsGetChildCount(cameraList, out int count);
+                    int count;
+                    err = EDSDK.EdsGetChildCount(devices, out count);
 
                     for (int i = 0; i < count; i++)
                     {
-                        err = EDSDK.EdsGetChildAtIndex(cameraList, i, out IntPtr cam);
-                        err = EDSDK.EdsGetDeviceInfo(cam, out EDSDK.EdsDeviceInfo info);
+                        IntPtr cam;
+                        err = EDSDK.EdsGetChildAtIndex(devices, i, out cam);
 
                         cams.Add(cam);
                     }
