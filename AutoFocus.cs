@@ -11,6 +11,7 @@
 
 using Dasync.Collections;
 using EDSDKLib;
+using LensAF.Properties;
 using NINA.Core.Enum;
 using NINA.Core.Model;
 using NINA.Core.Model.Equipment;
@@ -18,10 +19,12 @@ using NINA.Core.Utility;
 using NINA.Equipment.Interfaces.Mediator;
 using NINA.Equipment.Model;
 using NINA.Image.Interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace LensAF
 {
@@ -37,15 +40,24 @@ namespace LensAF
         }
         public async Task<AutoFocusResult> RunAF(IntPtr canon, ICameraMediator camera, IImagingMediator imaging, AutoFocusSettings settings)
         {
+            DateTime start = DateTime.Now;
             bool Focused = false;
-            const int near = (int)EDSDK.EvfDriveLens_Near2;
-            const int far = (int)EDSDK.EvfDriveLens_Far2;
+            int near;
+            int far;
+            if (Settings.Default.SelectedStepSize == 0)
+            {
+                near = (int)EDSDK.EvfDriveLens_Near1;
+                far = (int)EDSDK.EvfDriveLens_Far1;
+            } 
+            else
+            {
+                near = (int)EDSDK.EvfDriveLens_Near2;
+                far = (int)EDSDK.EvfDriveLens_Far2;
+            }
             int iteration = 0;
             List<FocusPoint> FocusPoints = new List<FocusPoint>();
             try
             {
-                CalibrateLens(camera, canon);
-
                 // Needed Variables
                 CancellationTokenSource cts = new CancellationTokenSource();
 
@@ -54,6 +66,10 @@ namespace LensAF
                 // LiveView Loop
                 await liveViewEnumerable.ForEachAsync(async _ =>
                 {
+                    if (iteration == 0)
+                    {
+                        CalibrateLens(canon);
+                    }
 
                     // Break out of loop it it seems like it is stuck
                     if (iteration > settings.MaxTryCount)
@@ -79,8 +95,8 @@ namespace LensAF
                         new BinningMode(1, 1),
                         1),
                         Token, Progress);
-                    IImageData imageData = await data.ToImageData(Progress, cts.Token);
-                    IRenderedImage image = await imaging.PrepareImage(imageData, new PrepareImageParameters(), cts.Token);
+                    IImageData imageData = await data.ToImageData(Progress, Token);
+                    IRenderedImage image = await imaging.PrepareImage(imageData, new PrepareImageParameters(), Token);
                     image = await image.Stretch(settings.StretchFactor, settings.BlackClipping, true);
                     image = await image.DetectStars(false, StarSensitivityEnum.Normal, NoiseReductionEnum.None);
                     IStarDetectionAnalysis detection = image.RawImageData.StarDetectionAnalysis;
@@ -96,21 +112,25 @@ namespace LensAF
                         }
                     }
 
+                    if (Token.IsCancellationRequested)
+                    {
+                        cts.Cancel();
+                    }
 
                     // Increment iteration
                     iteration++;
                 });
             }
-            catch (TaskCanceledException)
-            {
-
-            }
+            catch (TaskCanceledException) { }
+            catch (OperationCanceledException) { }
             catch (Exception e)
             {
                 Logger.Error(e);
             }
             LastAF = DateTime.Now;
-            return new AutoFocusResult(Focused, FocusPoints);
+            AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, LastAF - start);
+            GenerateLog(settings, res);
+            return res;
         }
 
         private void DriveFocus(IntPtr cam, int direction)
@@ -119,27 +139,37 @@ namespace LensAF
             Thread.Sleep(500);
         }
 
-        private void CalibrateLens(ICameraMediator cam, IntPtr ptr)
+        /// <summary>
+        ///     This Calibrates the lens to the complete right (infinite)
+        ///     Camera has to be in Live View!!!
+        /// </summary>
+        /// <param name="ptr">IntPtr for the camera</param>
+        /// <returns></returns>
+        private void CalibrateLens(IntPtr ptr)
         {
-            CancellationTokenSource t = new CancellationTokenSource();
-            cam.LiveView(t.Token).ForEachAsync(async _ =>
+            int i = 0;
+            while (i != 5)
             {
-                int i = 0;
-                while (true)
-                {
-                    EDSDK.EdsSendCommand(ptr, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
-                    Thread.Sleep(750);
-                    Logger.Info(i.ToString());
-                    i++;
-                    if (i == 5)
-                    {
-                        EDSDK.EdsSendCommand(ptr, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
-                        Thread.Sleep(750); // Let Focus Settle, EDSDK does not wait for the lens to finish moving the focus
-                        break;
-                    }
-                }
-                t.Cancel();
-            });
+                EDSDK.EdsSendCommand(ptr, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
+                Thread.Sleep(750); // Let Focus Settle, EDSDK does not wait for the lens to finish moving the focus
+                i++;
+            }
+        }
+
+        public static void GenerateLog(AutoFocusSettings settings, AutoFocusResult result)
+        {
+            AutoFocusReport report = new AutoFocusReport()
+            {
+                Settings = settings,
+                Result = result
+            };
+            string ReportDirectory = Path.Combine(CoreUtil.APPLICATIONTEMPPATH, "AutoFocus", "Lens AF");
+            if (!Directory.Exists(ReportDirectory))
+            {
+                Directory.CreateDirectory(ReportDirectory);
+            }
+            string path = Path.Combine(ReportDirectory, DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss") + ".json");
+            File.WriteAllText(path, JsonConvert.SerializeObject(report));
         }
     }
 
@@ -147,7 +177,7 @@ namespace LensAF
     {
         public int ExposureTime = 5;
         public double BlackClipping = -2.8;
-        public double StretchFactor = 0.2;
+        public double StretchFactor = 0.15;
         public int MaxTryCount = 20;
     }
 
@@ -155,10 +185,13 @@ namespace LensAF
     {
         public bool Successfull;
         public List<FocusPoint> FocusPoints;
-        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints)
+        public TimeSpan Duration;
+        public int StepSize = Settings.Default.SelectedStepSize + 1;
+        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration)
         {
             Successfull = successfull;
             FocusPoints = focusPoints;
+            Duration = duration;
         }
     }
 
@@ -176,5 +209,11 @@ namespace LensAF
             Stars = analysis.DetectedStars;
             HFR = analysis.HFR;
         }
+    }
+
+    public class AutoFocusReport
+    {
+        public AutoFocusSettings Settings;
+        public AutoFocusResult Result;
     }
 }

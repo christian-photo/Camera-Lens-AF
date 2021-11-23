@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using LensAF.Properties;
 using NINA.Core;
 using NINA.Core.Utility;
 using NINA.Plugin;
@@ -21,9 +22,27 @@ namespace LensAF
     public class LensAF : PluginBase
     {
         [ImportingConstructor]
-        public LensAF() 
+        public LensAF()
         {
-            
+            if (Settings.Default.UpdateSettings)
+            {
+                Settings.Default.Upgrade();
+                Settings.Default.UpdateSettings = false;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
+
+        public int SelectedIndex
+        {
+            get
+            {
+                return Settings.Default.SelectedStepSize;
+            }
+            set
+            {
+                Settings.Default.SelectedStepSize = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
         }
     }
 }
