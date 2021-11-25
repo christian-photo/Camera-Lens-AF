@@ -46,5 +46,17 @@ namespace LensAF.Properties {
                 this["SelectedStepSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int ExposureTime {
+            get {
+                return ((int)(this["ExposureTime"]));
+            }
+            set {
+                this["ExposureTime"] = value;
+            }
+        }
     }
 }

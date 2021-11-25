@@ -8,14 +8,23 @@
 <ResourceDictionary
     x:Class="LensAF.Options"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ninactrl="clr-namespace:NINACustomControlLibrary;assembly=NINACustomControlLibrary">
     <DataTemplate x:Key="Lens AF_Options">
-        <StackPanel DataContext="{Binding}" Orientation="Horizontal">
-            <TextBlock Text="Auto focus Step Size ->  " Name="Test" FontSize="16"/>
-            <ComboBox SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" Width="150">
-                <ComboBoxItem Content="Step Size 1" HorizontalAlignment="Center"/>
-                <ComboBoxItem Content="Step Size 2" HorizontalAlignment="Center"/>
-            </ComboBox>
+        <StackPanel DataContext="{Binding}" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Auto focus Step Size ->  "/>
+                <ComboBox SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" Width="150">
+                    <ComboBoxItem Content="Step Size 1" HorizontalAlignment="Stretch"/>
+                    <ComboBoxItem Content="Step Size 2" HorizontalAlignment="Stretch"/>
+                    <ComboBoxItem Content="Step Size 3" HorizontalAlignment="Stretch"/>
+                    <ComboBoxItem Content="Step Size 4" HorizontalAlignment="Stretch"/>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Exposure Time ->  "/>
+                <ninactrl:UnitTextBox Text="{Binding ExposureTime, Mode=TwoWay}" Width="150" Unit="s"/>
+            </StackPanel>
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>

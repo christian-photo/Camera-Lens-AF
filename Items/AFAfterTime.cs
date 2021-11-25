@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using LensAF.Properties;
 using LensAF.Util;
 using Newtonsoft.Json;
 using NINA.Core.Model;
@@ -126,8 +127,11 @@ namespace LensAF.Items
             // Get Selected Cam
             IntPtr ptr = camsTable[Cams[Index]];
 
-            Logger.Info("Starting Autofocus");
-            AutoFocusResult result = await new AutoFocus(token, progress).RunAF(ptr, cam, imaging, new AutoFocusSettings());
+            AutoFocusSettings settings = new AutoFocusSettings();
+            settings.ExposureTime = Settings.Default.ExposureTime;
+
+            Logger.Info("Starting Auto focus");
+            AutoFocusResult result = await new AutoFocus(token, progress).RunAF(ptr, cam, imaging, settings);
 
             if (result.Successfull)
             {

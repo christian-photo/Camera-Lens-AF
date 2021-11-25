@@ -44,5 +44,18 @@ namespace LensAF
                 CoreUtil.SaveSettings(Settings.Default);
             }
         }
+
+        public int ExposureTime
+        {
+            get
+            {
+                return Settings.Default.ExposureTime;
+            }
+            set
+            {
+                Settings.Default.ExposureTime = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
     }
 }

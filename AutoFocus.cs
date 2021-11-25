@@ -44,7 +44,7 @@ namespace LensAF
             bool Focused = false;
             int near;
             int far;
-            if (Settings.Default.SelectedStepSize == 0)
+            if (Settings.Default.SelectedStepSize == 0 || Settings.Default.SelectedStepSize == 1)
             {
                 near = (int)EDSDK.EvfDriveLens_Near1;
                 far = (int)EDSDK.EvfDriveLens_Far1;
@@ -77,12 +77,6 @@ namespace LensAF
                         cts.Cancel();
                     }
 
-                    // Break out of loop if focused
-                    if (Focused)
-                    {
-                        cts.Cancel();
-                    }
-
                     // Drive Focus
                     DriveFocus(canon, near);
                     Logger.Trace($"Moving Focus... iteration {iteration}");
@@ -107,8 +101,9 @@ namespace LensAF
                     {
                         if (detection.HFR > FocusPoints[FocusPoints.Count - 2].HFR)
                         {
-                            DriveFocus(canon, far);
+                            DriveFocus(canon, far, true);
                             Focused = true;
+                            cts.Cancel();
                         }
                     }
 
@@ -133,10 +128,33 @@ namespace LensAF
             return res;
         }
 
-        private void DriveFocus(IntPtr cam, int direction)
+        private void DriveFocus(IntPtr cam, int direction, bool isFar = false)
         {
             EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, direction);
-            Thread.Sleep(500);
+            if (Settings.Default.SelectedStepSize == 1)
+            {
+                if (isFar)
+                {
+                    EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                }
+                else
+                {
+                    EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                }
+            }
+            else if (Settings.Default.SelectedStepSize == 2)
+            {
+                if (isFar)
+                {
+                    EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                }
+                else
+                {
+                    EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                }
+            }
+            
+            Thread.Sleep(500); // Wait for focus the finish rotating
         }
 
         /// <summary>
