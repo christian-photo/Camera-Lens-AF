@@ -37,13 +37,25 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UseStars {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int SelectedStepSize {
             get {
-                return ((bool)(this["UseStars"]));
+                return ((int)(this["SelectedStepSize"]));
             }
             set {
-                this["UseStars"] = value;
+                this["SelectedStepSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int ExposureTime {
+            get {
+                return ((int)(this["ExposureTime"]));
+            }
+            set {
+                this["ExposureTime"] = value;
             }
         }
     }

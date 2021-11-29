@@ -24,6 +24,10 @@ using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
 using LensAF.Util;
+using EDSDKLib;
+using Dasync.Collections;
+using LensAF.Properties;
+using NINA.Profile.Interfaces;
 
 namespace LensAF.Items
 {
@@ -37,6 +41,7 @@ namespace LensAF.Items
 
         private readonly ICameraMediator cam;
         private readonly IImagingMediator med;
+        private readonly IProfileService profile;
         private readonly Utility utility;
         private List<IntPtr> ptrs;
         private readonly List<string> _cams;
@@ -44,10 +49,11 @@ namespace LensAF.Items
         public RelayCommand Reload { get; set; }
 
         [ImportingConstructor]
-        public AFInstruction(ICameraMediator camera, IImagingMediator imagingMediator)
+        public AFInstruction(ICameraMediator camera, IImagingMediator imagingMediator, IProfileService profileService)
         {
             cam = camera;
             med = imagingMediator;
+            profile = profileService;
             utility = new Utility();
             ptrs = utility.GetConnectedCams();
             _cams = new List<string>();
@@ -60,7 +66,7 @@ namespace LensAF.Items
 
             Rescan();
         }
-        public AFInstruction(AFInstruction copyMe) : this(copyMe.cam, copyMe.med) {
+        public AFInstruction(AFInstruction copyMe) : this(copyMe.cam, copyMe.med, copyMe.profile) {
             CopyMetaData(copyMe);
         }
 
@@ -100,8 +106,13 @@ namespace LensAF.Items
             // Get Selected Cam
             IntPtr ptr = camsTable[Cams[Index]];
 
+            AutoFocusSettings settings = new AutoFocusSettings();
+            settings.ExposureTime = Settings.Default.ExposureTime;
+            settings.StretchFactor = profile.ActiveProfile.ImageSettings.AutoStretchFactor;
+            settings.BlackClipping = profile.ActiveProfile.ImageSettings.BlackClipping;
+
             Logger.Info("Starting Auto focus");
-            AutoFocusResult result = await new AutoFocus(token, progress).RunAF(ptr, cam, med, new AutoFocusSettings());
+            AutoFocusResult result = await new AutoFocus(token, progress).RunAF(ptr, cam, med, settings);
             
             if (result.Successfull)
             {
