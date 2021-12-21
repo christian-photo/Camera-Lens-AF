@@ -39,10 +39,10 @@
             <nina:SequenceBlockView.SequenceItemContent>
                 <StackPanel Orientation="Horizontal">
                     
-                    <ComboBox ItemsSource="{Binding Cams, Mode=OneWay}"
+                    <ComboBox ItemsSource="{Binding Cams, Mode=TwoWay}"
                               SelectedIndex="{Binding Index, Mode=TwoWay}"/>
-                    
-                    <TextBlock Text="  |  Rescan for Cameras -> "
+
+                    <!--<TextBlock Text="  |  Rescan for Cameras -> "
                                VerticalAlignment="Center"/>
 
                     <Button Width="26"
@@ -51,7 +51,7 @@
 
                         <Image Source="{StaticResource reload}" Margin="2,2,2,2"/>
 
-                    </Button>
+                    </Button>-->
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemContent>
         </nina:SequenceBlockView>
@@ -62,10 +62,10 @@
             <nina:SequenceBlockView.SequenceItemContent>
                 <StackPanel Orientation="Horizontal">
 
-                    <ComboBox ItemsSource="{Binding Cams, Mode=OneWay}"
+                    <ComboBox ItemsSource="{Binding Cams, Mode=TwoWay}"
                               SelectedIndex="{Binding Index, Mode=TwoWay}"/>
 
-                    <TextBlock Text="  |  Rescan for Cameras -> "
+                    <!--<TextBlock Text="  |  Rescan for Cameras -> "
                                VerticalAlignment="Center"/>
 
                     <Button Width="26"
@@ -74,7 +74,7 @@
 
                         <Image Source="{StaticResource reload}" Margin="2,2,2,2"/>
 
-                    </Button>
+                    </Button>-->
 
                     <TextBlock Text="  |  Amount "
                                VerticalAlignment="Center"/>
@@ -89,10 +89,10 @@
             <nina:SequenceBlockView.SequenceItemContent>
                 <StackPanel Orientation="Horizontal">
 
-                    <ComboBox ItemsSource="{Binding Cams, Mode=OneWay}"
+                    <ComboBox ItemsSource="{Binding Cams, Mode=TwoWay}"
                               SelectedIndex="{Binding Index, Mode=TwoWay}"/>
 
-                    <TextBlock Text="  |  Rescan for Cameras -> "
+                    <!--<TextBlock Text="  |  Rescan for Cameras -> "
                                VerticalAlignment="Center"/>
 
                     <Button Width="26"
@@ -101,7 +101,7 @@
 
                         <Image Source="{StaticResource reload}" Margin="2,2,2,2"/>
 
-                    </Button>
+                    </Button>-->
 
                     <TextBlock Text="  |  Amount "
                                VerticalAlignment="Center"/>

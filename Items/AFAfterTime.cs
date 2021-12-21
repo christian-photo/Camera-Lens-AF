@@ -197,6 +197,7 @@ namespace LensAF.Items
                     camsTable.Add(utility.GetCamName(ptr), ptr);
                 }
             }
+            RaisePropertyChanged(nameof(Cams));
             Index = 0;
         }
     }

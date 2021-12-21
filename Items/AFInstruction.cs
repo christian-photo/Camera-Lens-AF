@@ -28,6 +28,8 @@ using EDSDKLib;
 using Dasync.Collections;
 using LensAF.Properties;
 using NINA.Profile.Interfaces;
+using OxyPlot.Wpf;
+using OxyPlot.Series;
 
 namespace LensAF.Items
 {
@@ -169,6 +171,8 @@ namespace LensAF.Items
                     camsTable.Add(utility.GetCamName(ptr), ptr);
                 }
             }
+            RaisePropertyChanged(nameof(Cams));
+            Index = 0;
         }
     }
 }

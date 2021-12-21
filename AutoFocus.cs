@@ -120,7 +120,7 @@ namespace LensAF
             catch (OperationCanceledException) { }
             catch (Exception e)
             {
-                Logger.Error(e);
+                throw e;
             }
             LastAF = DateTime.Now;
             AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, LastAF - start);

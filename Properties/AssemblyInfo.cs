@@ -38,10 +38,31 @@ using System.Runtime.InteropServices;
 //[Optional] An in-depth description of your plugin
 [assembly: AssemblyMetadata("LongDescription", @"This Plugin provides an instruction to run an AF with your camera lens attached to a Canon Camera
 
+## Important Note!
+**Test the plugin before you use it in your imaging runs. This plugin may not work for everyone!**
+
+
 **Requirements**:  
 - A Canon Camera,  
 - A Camera Lens that supports AF
-")]
+- The Camera has to be connected to NINA before the sequence gets loaded in to be correctly picked by the plugin
+
+The plugin was tested using the following camera and lenses:
+- Canon EOS 600d
+- Canon EF 100-400 f/4.5-5.6 L IS USM
+- Canon EF 24-105 f/4 L IS USM
+
+
+Known issues:
+- Some cameras or lenses may try to refocus, when taking images if the lens is set to AF
+
+
+
+#Troubleshooting:
+What to try if:
+- ...the focus doesn't move: Try a different step size (3 or 4 always worked for me) or try switching your lens from AF/MF to MF/AF
+- ...the plugin didn't result in good focus: Try a different step size (3 or 4 always worked for me)
+- ...the sequence item doesn't detect the camera: Try to delete and add the sequence item again")]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible
