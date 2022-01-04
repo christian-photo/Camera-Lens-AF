@@ -45,7 +45,7 @@ namespace LensAF
             }
         }
 
-        public int ExposureTime
+        public double ExposureTime
         {
             get
             {

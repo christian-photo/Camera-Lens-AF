@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.0.0.1")]
-[assembly: AssemblyFileVersion("1.0.0.1")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 
 // The minimum Version of N.I.N.A. that this plugin is compatible with
-[assembly: AssemblyMetadata("MinimumApplicationVersion", "2.0.0.2004")]
+[assembly: AssemblyMetadata("MinimumApplicationVersion", "2.0.0.2017")]
 
 // The license your plugin code is using
 [assembly: AssemblyMetadata("License", "MPL-2.0")]
@@ -39,7 +39,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("LongDescription", @"This Plugin provides an instruction to run an AF with your camera lens attached to a Canon Camera
 
 ## Important Note!
-**Test the plugin before you use it in your imaging runs. This plugin may not work for everyone!**
+**Test the plugin before you use it in your imaging runs, because this plugin may not work for everyone! This plugin doesn't work with ASCOM.DSLR unfortuantely!**
+If you have questions/feedback/issues, you can ask on the [NINA discord](https://discord.com/invite/nighttime-imaging) in #plugin-discussions or create an issue [here](https://github.com/rennmaus-coder/Camera-Lens-AF/issues)
 
 
 **Requirements**:  
@@ -58,10 +59,11 @@ Known issues:
 
 
 
+
 #Troubleshooting:
 What to try if:
-- ...the focus doesn't move: Try a different step size (3 or 4 always worked for me) or try switching your lens from AF/MF to MF/AF
-- ...the plugin didn't result in good focus: Try a different step size (3 or 4 always worked for me)
+- ...the focus doesn't move: Try a different step size (6 always worked for me) or try switching your lens from AF/MF to MF/AF
+- ...the plugin didn't result in good focus: Try a different step size (6 always worked for me)
 - ...the sequence item doesn't detect the camera: Try to delete and add the sequence item again")]
 
 

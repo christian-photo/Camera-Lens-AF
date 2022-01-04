@@ -50,9 +50,9 @@ namespace LensAF.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int ExposureTime {
+        public double ExposureTime {
             get {
-                return ((int)(this["ExposureTime"]));
+                return ((double)(this["ExposureTime"]));
             }
             set {
                 this["ExposureTime"] = value;

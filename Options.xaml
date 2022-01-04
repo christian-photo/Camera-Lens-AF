@@ -19,6 +19,10 @@
                     <ComboBoxItem Content="Step Size 2" HorizontalAlignment="Stretch"/>
                     <ComboBoxItem Content="Step Size 3" HorizontalAlignment="Stretch"/>
                     <ComboBoxItem Content="Step Size 4" HorizontalAlignment="Stretch"/>
+                    <ComboBoxItem Content="Step Size 5" HorizontalAlignment="Stretch"/>
+                    <ComboBoxItem Content="Step Size 6" HorizontalAlignment="Stretch"/>
+                    <ComboBoxItem Content="Step Size 7" HorizontalAlignment="Stretch"/>
+                    <ComboBoxItem Content="Step Size 8" HorizontalAlignment="Stretch"/>
                 </ComboBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="10">

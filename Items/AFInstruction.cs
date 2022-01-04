@@ -114,7 +114,7 @@ namespace LensAF.Items
             settings.BlackClipping = profile.ActiveProfile.ImageSettings.BlackClipping;
 
             Logger.Info("Starting Auto focus");
-            AutoFocusResult result = await new AutoFocus(token, progress).RunAF(ptr, cam, med, settings);
+            AutoFocusResult result = await new AutoFocus(token, progress, profile).RunAF(ptr, cam, med, settings);
             
             if (result.Successfull)
             {

@@ -16,6 +16,7 @@ using NINA.Core.Model;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces.Mediator;
+using NINA.Profile.Interfaces;
 using NINA.Sequencer.Container;
 using NINA.Sequencer.Interfaces;
 using NINA.Sequencer.SequenceItem;
@@ -44,6 +45,7 @@ namespace LensAF.Items
         private IImageHistoryVM history;
         private ICameraMediator cam;
         private IImagingMediator imaging;
+        private IProfileService profile;
         private Utility utility;
         private List<IntPtr> ptrs;
         private readonly List<string> _cams;
@@ -52,11 +54,12 @@ namespace LensAF.Items
         public RelayCommand Reload { get; set; }
 
         [ImportingConstructor]
-        public AFAfterTime(IImageHistoryVM history, ICameraMediator camera, IImagingMediator imaging)
+        public AFAfterTime(IImageHistoryVM history, ICameraMediator camera, IImagingMediator imaging, IProfileService profile)
         {
             this.history = history;
             cam = camera;
             this.imaging = imaging;
+            this.profile = profile;
             utility = new Utility();
             ptrs = utility.GetConnectedCams();
             _cams = new List<string>();
@@ -106,7 +109,7 @@ namespace LensAF.Items
 
         public override object Clone()
         {
-            return new AFAfterTime(history, cam, imaging)
+            return new AFAfterTime(history, cam, imaging, profile)
             {
                 Icon = Icon,
                 Name = Name,
@@ -131,7 +134,7 @@ namespace LensAF.Items
             settings.ExposureTime = Settings.Default.ExposureTime;
 
             Logger.Info("Starting Auto focus");
-            AutoFocusResult result = await new AutoFocus(token, progress).RunAF(ptr, cam, imaging, settings);
+            AutoFocusResult result = await new AutoFocus(token, progress, profile).RunAF(ptr, cam, imaging, settings);
 
             if (result.Successfull)
             {
