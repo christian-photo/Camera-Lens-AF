@@ -37,7 +37,7 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
         public int SelectedStepSize {
             get {
                 return ((int)(this["SelectedStepSize"]));
@@ -56,6 +56,54 @@ namespace LensAF.Properties {
             }
             set {
                 this["ExposureTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int StepSizeBig {
+            get {
+                return ((int)(this["StepSizeBig"]));
+            }
+            set {
+                this["StepSizeBig"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int StepSizeSmall {
+            get {
+                return ((int)(this["StepSizeSmall"]));
+            }
+            set {
+                this["StepSizeSmall"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseMixedStepSize {
+            get {
+                return ((bool)(this["UseMixedStepSize"]));
+            }
+            set {
+                this["UseMixedStepSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int StepSizeLogic {
+            get {
+                return ((int)(this["StepSizeLogic"]));
+            }
+            set {
+                this["StepSizeLogic"] = value;
             }
         }
     }

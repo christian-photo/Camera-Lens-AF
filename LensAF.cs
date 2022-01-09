@@ -57,5 +57,57 @@ namespace LensAF
                 CoreUtil.SaveSettings(Settings.Default);
             }
         }
+
+        public int StepSizeBig
+        {
+            get
+            {
+                return Settings.Default.StepSizeBig;
+            }
+            set
+            {
+                Settings.Default.StepSizeBig = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
+
+        public int StepSizeSmall
+        {
+            get
+            {
+                return Settings.Default.StepSizeSmall;
+            }
+            set
+            {
+                Settings.Default.StepSizeSmall = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
+
+        public bool UseMixedStepSize
+        {
+            get
+            {
+                return Settings.Default.UseMixedStepSize;
+            }
+            set
+            {
+                Settings.Default.UseMixedStepSize = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
+
+        public int StepSizeLogic
+        {
+            get
+            {
+                return Settings.Default.StepSizeLogic;
+            }
+            set
+            {
+                Settings.Default.StepSizeLogic = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
     }
 }

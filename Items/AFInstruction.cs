@@ -1,7 +1,7 @@
 ﻿#region "copyright"
 
 /*
-    Copyright © 2021 Christian Palm (christian@palm-family.de)
+    Copyright © 2022 Christian Palm (christian@palm-family.de)
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -9,12 +9,14 @@
 
 #endregion "copyright"
 
+using LensAF.Properties;
+using LensAF.Util;
 using Newtonsoft.Json;
 using NINA.Core.Model;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
-using NINA.Image.Interfaces;
 using NINA.Equipment.Interfaces.Mediator;
+using NINA.Profile.Interfaces;
 using NINA.Sequencer.SequenceItem;
 using NINA.Sequencer.Validations;
 using System;
@@ -23,13 +25,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
-using LensAF.Util;
-using EDSDKLib;
-using Dasync.Collections;
-using LensAF.Properties;
-using NINA.Profile.Interfaces;
-using OxyPlot.Wpf;
-using OxyPlot.Series;
 
 namespace LensAF.Items
 {
@@ -39,15 +34,14 @@ namespace LensAF.Items
     [ExportMetadata("Category", "Lens AF")]
     [Export(typeof(ISequenceItem))]
     [JsonObject(MemberSerialization.OptIn)]
-    public class AFInstruction : SequenceItem, IValidatable {
-
+    public class AFInstruction : SequenceItem, IValidatable
+    {
         private readonly ICameraMediator cam;
         private readonly IImagingMediator med;
         private readonly IProfileService profile;
         private readonly Utility utility;
         private List<IntPtr> ptrs;
-        private readonly List<string> _cams;
-        private readonly Dictionary<string, IntPtr> camsTable;
+        private Dictionary<string, IntPtr> camsTable;
         public RelayCommand Reload { get; set; }
 
         [ImportingConstructor]
@@ -68,16 +62,19 @@ namespace LensAF.Items
 
             Rescan();
         }
-        public AFInstruction(AFInstruction copyMe) : this(copyMe.cam, copyMe.med, copyMe.profile) {
+
+        public AFInstruction(AFInstruction copyMe) : this(copyMe.cam, copyMe.med, copyMe.profile)
+        {
             CopyMetaData(copyMe);
         }
 
+        private List<string> _cams;
         public List<string> Cams
         {
             get { return _cams; }
             set
             {
-                Cams = value;
+                _cams = value;
                 RaisePropertyChanged();
             }
         }
@@ -87,8 +84,8 @@ namespace LensAF.Items
         public int Index
         {
             get { return _index; }
-            set 
-            { 
+            set
+            {
                 _index = value;
                 RaisePropertyChanged();
             }
@@ -115,7 +112,7 @@ namespace LensAF.Items
 
             Logger.Info("Starting Auto focus");
             AutoFocusResult result = await new AutoFocus(token, progress, profile).RunAF(ptr, cam, med, settings);
-            
+
             if (result.Successfull)
             {
                 Logger.Info("Auto focus Successfull");
@@ -125,11 +122,13 @@ namespace LensAF.Items
             return;
         }
 
-        public override object Clone() {
+        public override object Clone()
+        {
             return new AFInstruction(this);
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return $"Category: {Category}, Item: {nameof(AFInstruction)}";
         }
 
@@ -156,22 +155,23 @@ namespace LensAF.Items
         {
             ptrs = utility.GetConnectedCams();
 
-            Cams.Clear();
-            camsTable.Clear();
+            Dictionary<string, IntPtr> dict = new Dictionary<string, IntPtr>();
+            List<string> list = new List<string>();
 
             if (ptrs.Count == 0)
             {
-                Cams.Add("No Camera Connected");
+                list.Add("No Camera Connected");
             }
             else
             {
                 foreach (IntPtr ptr in ptrs)
                 {
-                    Cams.Add(utility.GetCamName(ptr));
-                    camsTable.Add(utility.GetCamName(ptr), ptr);
+                    list.Add(utility.GetCamName(ptr));
+                    dict.Add(utility.GetCamName(ptr), ptr);
                 }
             }
-            RaisePropertyChanged(nameof(Cams));
+            Cams = list;
+            camsTable = dict;
             Index = 0;
         }
     }

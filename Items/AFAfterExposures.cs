@@ -1,7 +1,7 @@
 ﻿#region "copyright"
 
 /*
-    Copyright © 2021 Christian Palm (christian@palm-family.de)
+    Copyright © 2022 Christian Palm (christian@palm-family.de)
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -48,8 +48,7 @@ namespace LensAF.Items
         private IProfileService profile;
         private Utility utility;
         private List<IntPtr> ptrs;
-        private readonly List<string> _cams;
-        private readonly Dictionary<string, IntPtr> camsTable;
+        private Dictionary<string, IntPtr> camsTable;
 
         public RelayCommand Reload { get; set; }
 
@@ -73,12 +72,13 @@ namespace LensAF.Items
             Rescan();
         }
 
+        private List<string> _cams;
         public List<string> Cams
         {
             get { return _cams; }
             set
             {
-                Cams = value;
+                _cams = value;
                 RaisePropertyChanged();
             }
         }
@@ -96,6 +96,7 @@ namespace LensAF.Items
         }
 
         public int afterExposures = 10;
+
         [JsonProperty]
         public int AfterExposures
         {
@@ -192,22 +193,23 @@ namespace LensAF.Items
         {
             ptrs = utility.GetConnectedCams();
 
-            Cams.Clear();
-            camsTable.Clear();
+            Dictionary<string, IntPtr> dict = new Dictionary<string, IntPtr>();
+            List<string> list = new List<string>();
 
             if (ptrs.Count == 0)
             {
-                Cams.Add("No Camera Connected");
+                list.Add("No Camera Connected");
             }
             else
             {
                 foreach (IntPtr ptr in ptrs)
                 {
-                    Cams.Add(utility.GetCamName(ptr));
-                    camsTable.Add(utility.GetCamName(ptr), ptr);
+                    list.Add(utility.GetCamName(ptr));
+                    dict.Add(utility.GetCamName(ptr), ptr);
                 }
             }
-            RaisePropertyChanged(nameof(Cams));
+            Cams = list;
+            camsTable = dict;
             Index = 0;
         }
     }
