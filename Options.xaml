@@ -4,7 +4,7 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
-    
+
 <ResourceDictionary
     x:Class="LensAF.Options"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -12,38 +12,54 @@
     xmlns:ninactrl="clr-namespace:NINACustomControlLibrary;assembly=NINACustomControlLibrary">
     <DataTemplate x:Key="Lens AF_Options">
         <StackPanel DataContext="{Binding}" Orientation="Vertical">
-            
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <TextBlock Text="Auto focus Step Size ->  "/>
-                <ComboBox SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" Width="150">
-                    <ComboBoxItem Content="Step Size 1" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 2" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 3" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 4" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 5" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 6" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 7" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 8" HorizontalAlignment="Stretch"/>
+
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock Text="Auto focus Step Size -&gt;  " />
+                <ComboBox Width="150" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 1" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 2" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 3" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 4" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 5" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 6" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 7" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 8" />
                 </ComboBox>
             </StackPanel>
-            
-            <StackPanel Orientation="Horizontal" Margin="10,10,10,20">
-                <TextBlock Text="Use mixed step size:" Margin="0,2,0,0"/>
-                <CheckBox IsChecked="{Binding UseMixedStepSize}" Width="100" Margin="0,0,0,2"/>
-                <TextBlock Text="  Big Steps:" Margin="0,2,0,0"/>
-                <ninactrl:UnitTextBox Text="{Binding StepSizeBig}" Width="50" Margin="5,0,0,5"/>
-                <ComboBox SelectedIndex="{Binding StepSizeLogic, Mode=TwoWay}" Width="Auto" Height="22" Margin="10,0,10,5">
-                    <ComboBoxItem Content="+" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="-" HorizontalAlignment="Stretch"/>
+
+            <StackPanel Margin="10,10,10,20" Orientation="Horizontal">
+                <TextBlock Margin="0,2,0,0" Text="Use mixed step size:" />
+                <CheckBox
+                    Width="100"
+                    Margin="0,0,0,2"
+                    IsChecked="{Binding UseMixedStepSize}" />
+                <TextBlock Margin="0,2,0,0" Text="  Big Steps:" />
+                <ninactrl:UnitTextBox
+                    Width="50"
+                    Margin="5,0,0,5"
+                    Text="{Binding StepSizeBig}" />
+                <ComboBox
+                    Width="Auto"
+                    Height="22"
+                    Margin="10,0,10,5"
+                    SelectedIndex="{Binding StepSizeLogic, Mode=TwoWay}">
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="+" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="-" />
                 </ComboBox>
-                <TextBlock Text="  Small Steps:" Margin="0,2,0,0"/>
-                <ninactrl:UnitTextBox Text="{Binding StepSizeSmall}" Width="50" Margin="5,0,0,5"/>
+                <TextBlock Margin="0,2,0,0" Text="  Small Steps:" />
+                <ninactrl:UnitTextBox
+                    Width="50"
+                    Margin="5,0,0,5"
+                    Text="{Binding StepSizeSmall}" />
             </StackPanel>
-            
-            
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <TextBlock Text="Exposure Time ->  "/>
-                <ninactrl:UnitTextBox Text="{Binding ExposureTime, Mode=TwoWay}" Width="150" Unit="s"/>
+
+
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock Text="Exposure Time -&gt;  " />
+                <ninactrl:UnitTextBox
+                    Width="150"
+                    Text="{Binding ExposureTime, Mode=TwoWay}"
+                    Unit="s" />
             </StackPanel>
         </StackPanel>
     </DataTemplate>

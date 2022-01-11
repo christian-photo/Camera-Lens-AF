@@ -11,6 +11,7 @@
 
 using Dasync.Collections;
 using EDSDKLib;
+using LensAF.Dockable;
 using LensAF.Properties;
 using LensAF.Util;
 using Newtonsoft.Json;
@@ -23,6 +24,7 @@ using NINA.Equipment.Model;
 using NINA.Image.ImageAnalysis;
 using NINA.Image.Interfaces;
 using NINA.Profile.Interfaces;
+using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -100,6 +102,8 @@ namespace LensAF
                     StarDetectionResult detection = await PrepareImage(data, settings, imaging);
                     FocusPoints.Add(new FocusPoint(detection));
 
+                    AddToPlot(detection, iteration);
+
                     // Check if focused
                     if (iteration >= 1)
                     {
@@ -124,10 +128,22 @@ namespace LensAF
             catch (OperationCanceledException) { }
 
             LastAF = DateTime.Now;
-            AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, LastAF - start);
+            AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, LastAF - start, LastAF);
             CameraInfo info = new CameraInfo(canon);
             GenerateLog(settings, res, info);
+            if (LensAFVM.Instance != null)
+            {
+                LensAFVM.Instance.LastAF = LastAF.ToString("HH:m");
+            }
             return res;
+        }
+
+        private void AddToPlot(StarDetectionResult detection, int iteration)
+        {
+            if (LensAFVM.Instance != null)
+            {
+                LensAFVM.Instance.PlotFocusPoints.Add(new DataPoint(iteration, detection.AverageHFR));
+            }
         }
 
         private void DriveFocus(IntPtr cam, FocusDirection direction)
@@ -432,13 +448,15 @@ namespace LensAF
         public bool Successfull;
         public List<FocusPoint> FocusPoints;
         public TimeSpan Duration;
+        public DateTime Time;
         public int StepSize = Settings.Default.SelectedStepSize + 1;
 
-        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration)
+        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration, DateTime time)
         {
             Successfull = successfull;
             FocusPoints = focusPoints;
             Duration = duration;
+            Time = time;
         }
     }
 

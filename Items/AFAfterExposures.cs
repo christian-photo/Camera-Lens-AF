@@ -46,7 +46,6 @@ namespace LensAF.Items
         private ICameraMediator cam;
         private IImagingMediator imaging;
         private IProfileService profile;
-        private Utility utility;
         private List<IntPtr> ptrs;
         private Dictionary<string, IntPtr> camsTable;
 
@@ -59,8 +58,7 @@ namespace LensAF.Items
             cam = camera;
             this.imaging = imaging;
             this.profile = profile;
-            utility = new Utility();
-            ptrs = utility.GetConnectedCams();
+            ptrs = Utility.GetConnectedCams();
             _cams = new List<string>();
             camsTable = new Dictionary<string, IntPtr>();
 
@@ -191,7 +189,7 @@ namespace LensAF.Items
 
         private void Rescan()
         {
-            ptrs = utility.GetConnectedCams();
+            ptrs = Utility.GetConnectedCams();
 
             Dictionary<string, IntPtr> dict = new Dictionary<string, IntPtr>();
             List<string> list = new List<string>();
@@ -204,8 +202,8 @@ namespace LensAF.Items
             {
                 foreach (IntPtr ptr in ptrs)
                 {
-                    list.Add(utility.GetCamName(ptr));
-                    dict.Add(utility.GetCamName(ptr), ptr);
+                    list.Add(Utility.GetCamName(ptr));
+                    dict.Add(Utility.GetCamName(ptr), ptr);
                 }
             }
             Cams = list;

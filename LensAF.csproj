@@ -285,6 +285,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoFocus.cs" />
+    <Compile Include="Dockable\LensAFDockable.xaml.cs">
+      <DependentUpon>LensAFDockable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dockable\LensAFVM.cs" />
     <Compile Include="Items\AFAfterExposures.cs" />
     <Compile Include="Items\AFAfterTime.cs" />
     <Compile Include="LensAF.cs" />
@@ -313,6 +317,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Dockable\LensAFDockable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Options.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
