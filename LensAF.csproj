@@ -292,6 +292,7 @@
     <Compile Include="Items\AFAfterExposures.cs" />
     <Compile Include="Items\AFAfterTime.cs" />
     <Compile Include="LensAF.cs" />
+    <Compile Include="Util\AutoFocusHelper.cs" />
     <Compile Include="Util\CameraInfo.cs" />
     <Compile Include="Util\Utility.cs" />
     <Compile Include="Options.xaml.cs">

@@ -76,9 +76,15 @@ namespace LensAF
                         CalibrateLens(canon);
                     }
 
-                    // Break out of loop it it seems like it is stuck
-                    if (iteration > settings.MaxTryCount)
+                    // All Focuspoints are collected: Compute Final Focus Point
+                    if (iteration == settings.Iterations)
                     {
+                        int iterations = DetermineFinalFocusPoint(FocusPoints, settings.Iterations);
+                        for (int i = 0; i < iterations; i++)
+                        {
+                            DriveFocus(canon, FocusDirection.Far);
+                        }
+
                         cts.Cancel();
                     }
 
@@ -104,17 +110,6 @@ namespace LensAF
 
                     AddToPlot(detection, iteration);
 
-                    // Check if focused
-                    if (iteration >= 1)
-                    {
-                        if (detection.AverageHFR > FocusPoints[FocusPoints.Count - 2].HFR)
-                        {
-                            DriveFocus(canon, FocusDirection.Far);
-                            Focused = true;
-                            cts.Cancel();
-                        }
-                    }
-
                     if (Token.IsCancellationRequested)
                     {
                         cts.Cancel();
@@ -136,6 +131,21 @@ namespace LensAF
                 LensAFVM.Instance.LastAF = LastAF.ToString("HH:m");
             }
             return res;
+        }
+
+        private int DetermineFinalFocusPoint(List<FocusPoint> points, int iterations)
+        {
+            List<double> hfrs = new List<double>();
+            List<double> temp = new List<double>();
+            foreach (FocusPoint point in points)
+            {
+                hfrs.Add(point.HFR);
+                temp.Add(point.HFR);
+            }
+            hfrs.Sort();
+
+            int iteration = temp.IndexOf(hfrs[0]);
+            return iterations - iteration;
         }
 
         private void AddToPlot(StarDetectionResult detection, int iteration)
@@ -433,55 +443,5 @@ namespace LensAF
             string path = Path.Combine(ReportDirectory, DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss") + ".json");
             File.WriteAllText(path, JsonConvert.SerializeObject(report));
         }
-    }
-
-    public class AutoFocusSettings
-    {
-        public double ExposureTime = 5;
-        public double BlackClipping = -2.8;
-        public double StretchFactor = 0.15;
-        public int MaxTryCount = 15;
-    }
-
-    public class AutoFocusResult
-    {
-        public bool Successfull;
-        public List<FocusPoint> FocusPoints;
-        public TimeSpan Duration;
-        public DateTime Time;
-        public int StepSize = Settings.Default.SelectedStepSize + 1;
-
-        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration, DateTime time)
-        {
-            Successfull = successfull;
-            FocusPoints = focusPoints;
-            Duration = duration;
-            Time = time;
-        }
-    }
-
-    public class FocusPoint
-    {
-        public int Stars { get; set; }
-        public double HFR { get; set; }
-
-        public FocusPoint(StarDetectionResult analysis)
-        {
-            Stars = analysis.DetectedStars;
-            HFR = analysis.AverageHFR;
-        }
-    }
-
-    public class AutoFocusReport
-    {
-        public CameraInfo CanonInfo;
-        public AutoFocusSettings Settings;
-        public AutoFocusResult Result;
-    }
-
-    public enum FocusDirection
-    {
-        Far,
-        Near
     }
 }
