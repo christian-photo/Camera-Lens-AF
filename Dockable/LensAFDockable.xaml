@@ -46,6 +46,7 @@
 
                 <oxy:Plot.Axes>
                     <oxy:LinearAxis
+                        AbsoluteMinimum="0"
                         AxislineColor="{Binding Path=Color, Source={StaticResource PrimaryBrush}}"
                         EndPosition="1"
                         IsPanEnabled="False"

@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using LensAF.Dockable;
 using LensAF.Properties;
 using LensAF.Util;
 using Newtonsoft.Json;
@@ -121,8 +122,8 @@ namespace LensAF.Items
         {
             if (!Validate())
             {
-                Logger.Error("Could not run AF. Camera not connected!");
-                Notification.ShowWarning("Camera not connected. Skipping AF");
+                Logger.Error("Could not run AF");
+                Notification.ShowWarning("Skipping AF");
                 return;
             }
 
@@ -184,7 +185,12 @@ namespace LensAF.Items
                 Issues.Add("Non valid Camera selected");
             }
 
-            return cameraConnected;
+            if (LensAFVM.Instance.AutoFocusIsRunning)
+            {
+                Issues.Add("Autofocus already running");
+            }
+
+            return Issues.Count > 0;
         }
 
         private void Rescan()

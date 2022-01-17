@@ -22,6 +22,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading;
+using System.Windows;
+using System.Windows.Media;
 
 namespace LensAF.Dockable
 {
@@ -100,6 +102,10 @@ namespace LensAF.Dockable
         public LensAFVM(IProfileService profileService, ICameraMediator camera, IImagingMediator imagingMediator) : base(profileService)
         {
             Title = "Lens AF";
+            ResourceDictionary dict = new ResourceDictionary();
+            dict.Source = new Uri("/LensAF;component/Options.xaml", UriKind.RelativeOrAbsolute);
+            ImageGeometry = (GeometryGroup)dict["PluginSVG"];
+            ImageGeometry.Freeze();
 
             Camera = camera;
             Imaging = imagingMediator;
@@ -111,7 +117,7 @@ namespace LensAF.Dockable
 
             RunAF = new AsyncCommand<bool>(async () =>
             {
-                if (Validate())
+                if (!Validate())
                 {
                     ClearCharts();
                     ActiveToken = new CancellationTokenSource();
@@ -135,11 +141,19 @@ namespace LensAF.Dockable
 
             AbortAF = new RelayCommand(_ =>
             {
-                if (ActiveToken != null)
+                if ((ActiveToken != null) && AutoFocusIsRunning)
                 {
                     Logger.Info("Cancelling AF...");
                     Notification.ShowInformation("Cancelling AF... This may take a few seconds");
                     ActiveToken.Cancel();
+                    AutoFocusIsRunning = false;
+                }
+                else if ((AutoFocus.PublicToken != null) && AutoFocusIsRunning)
+                {
+                    Logger.Info("Cancelling AF...");
+                    Notification.ShowInformation("Cancelling AF... This may take a few seconds");
+                    AutoFocus.PublicToken.Cancel();
+                    AutoFocusIsRunning = false;
                 }
             });
 
@@ -195,12 +209,24 @@ namespace LensAF.Dockable
                 Issues.Add("Non valid Camera selected");
             }
 
-            return cameraConnected;
+            if (AutoFocusIsRunning)
+            {
+                Issues.Add("Autofocus already running");
+            }
+
+            return Issues.Count > 0;
         }
 
         private void ClearCharts() 
         {
-            PlotFocusPoints.Clear();
+            PlotFocusPoints = new List<DataPoint>();
+        }
+
+        public void AddToPlot(DataPoint point)
+        {
+            List<DataPoint> points = PlotFocusPoints;
+            points.Add(point);
+            PlotFocusPoints = points;
         }
     }
 }

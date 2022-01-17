@@ -9,7 +9,6 @@
 
 #endregion "copyright"
 
-using LensAF.Properties;
 using NINA.Image.ImageAnalysis;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,7 @@ namespace LensAF.Util
         public double ExposureTime = 5;
         public double BlackClipping = -2.8;
         public double StretchFactor = 0.15;
-        public int Iterations = 10;
+        public int Iterations = 9;
     }
 
     public class AutoFocusResult
@@ -30,14 +29,15 @@ namespace LensAF.Util
         public List<FocusPoint> FocusPoints;
         public TimeSpan Duration;
         public DateTime Time;
-        public int StepSize = Settings.Default.SelectedStepSize + 1;
+        public string StepSize;
 
-        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration, DateTime time)
+        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration, DateTime time, string stepsize)
         {
             Successfull = successfull;
             FocusPoints = focusPoints;
             Duration = duration;
             Time = time;
+            StepSize = stepsize;
         }
     }
 
