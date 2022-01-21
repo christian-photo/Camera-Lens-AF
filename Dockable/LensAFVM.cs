@@ -119,6 +119,14 @@ namespace LensAF.Dockable
             {
                 if (!Validate())
                 {
+                    foreach (string issue in Issues)
+                    {
+                        Notification.ShowError($"Can't start AutoFocus: {issue}");
+                        Logger.Error($"Can't start AutoFocus: {issue}");
+                    }
+                }
+                else
+                {
                     ClearCharts();
                     ActiveToken = new CancellationTokenSource();
                     ApplicationStatus status = GetStatus(string.Empty);
@@ -127,10 +135,7 @@ namespace LensAF.Dockable
                     AutoFocusIsRunning = false;
                     return result.Successfull;
                 }
-                foreach (string issue in Issues)
-                {
-                    Notification.ShowError($"Can't start AutoFocus: {issue}");
-                }
+
                 return false;
             });
 
@@ -214,7 +219,7 @@ namespace LensAF.Dockable
                 Issues.Add("Autofocus already running");
             }
 
-            return Issues.Count > 0;
+            return !(Issues.Count > 0);
         }
 
         private void ClearCharts() 

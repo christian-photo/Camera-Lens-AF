@@ -61,6 +61,7 @@ namespace LensAF
             DateTime start = DateTime.Now;
             bool Focused = false;
             int iteration = 0;
+            LensAFVM.Instance.AutoFocusIsRunning = true;
             List<FocusPoint> FocusPoints = new List<FocusPoint>();
             try
             {
@@ -97,23 +98,26 @@ namespace LensAF
                         PublicToken.Cancel();
                     }
 
-                    // Drive Focus
-                    DriveFocus(canon, FocusDirection.Near);
-                    Logger.Trace($"Moving Focus... iteration {iteration}");
+                    if (!Focused)
+                    {
+                        // Drive Focus
+                        DriveFocus(canon, FocusDirection.Near);
+                        Logger.Trace($"Moving Focus... iteration {iteration}");
 
-                    // Download and Prepare Image
-                    IRenderedImage data = await imaging.CaptureAndPrepareImage(new CaptureSequence(
-                        settings.ExposureTime,
-                        "AF Frame",
-                        new FilterInfo(),
-                        new BinningMode(1, 1),
-                        1),
-                        new PrepareImageParameters(true),
-                        Token, Progress);
-                    StarDetectionResult detection = await PrepareImage(data);
-                    FocusPoints.Add(new FocusPoint(detection));
+                        // Download and Prepare Image
+                        IRenderedImage data = await imaging.CaptureAndPrepareImage(new CaptureSequence(
+                            settings.ExposureTime,
+                            "AF Frame",
+                            new FilterInfo(),
+                            new BinningMode(1, 1),
+                            1),
+                            new PrepareImageParameters(true),
+                            Token, Progress);
+                        StarDetectionResult detection = await PrepareImage(data);
+                        FocusPoints.Add(new FocusPoint(detection));
 
-                    AddToPlot(detection, iteration);
+                        AddToPlot(detection, iteration);
+                    }
 
                     if (Token.IsCancellationRequested)
                     {
@@ -168,8 +172,15 @@ namespace LensAF
                 temp.Add(point.HFR);
             }
             hfrs.Sort();
+            int iteration;
+            int count = 0;
 
-            int iteration = temp.IndexOf(hfrs[0]);
+            do
+            {
+                iteration = temp.IndexOf(hfrs[count]);
+                count++;
+            } while (hfrs[count] == 0);
+            
             return iterations - iteration;
         }
 

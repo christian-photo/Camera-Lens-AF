@@ -151,7 +151,7 @@ namespace LensAF.Items
                 Issues.Add("Autofocus already running");
             }
 
-            return Issues.Count > 0;
+            return !(Issues.Count > 0);
         }
 
         // Rescan for new Cameras

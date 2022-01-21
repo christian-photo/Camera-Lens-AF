@@ -9,9 +9,11 @@
 
 #endregion "copyright"
 
+using LensAF.Dockable;
 using LensAF.Properties;
 using NINA.Core;
 using NINA.Core.Utility;
+using NINA.Core.Utility.Notification;
 using NINA.Plugin;
 using NINA.Plugin.Interfaces;
 using System.ComponentModel.Composition;
@@ -30,6 +32,11 @@ namespace LensAF
                 Settings.Default.UpdateSettings = false;
                 CoreUtil.SaveSettings(Settings.Default);
             }
+            ResetAF = new RelayCommand(_ =>
+            {
+                LensAFVM.Instance.AutoFocusIsRunning = false;
+                Notification.ShowInformation($"Auto focus is running: {LensAFVM.Instance.AutoFocusIsRunning}");
+            });
         }
 
         public int SelectedIndex
@@ -109,5 +116,7 @@ namespace LensAF
                 CoreUtil.SaveSettings(Settings.Default);
             }
         }
+
+        public RelayCommand ResetAF { get; set; }
     }
 }

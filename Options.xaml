@@ -66,6 +66,13 @@
                     Text="{Binding ExposureTime, Mode=TwoWay}"
                     Unit="s" />
             </StackPanel>
+            <Button
+                Width="200"
+                Height="30"
+                Margin="10"
+                HorizontalAlignment="Left"
+                Command="{Binding ResetAF}"
+                Content="Reset Auto focus is running" />
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>

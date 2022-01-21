@@ -151,7 +151,7 @@ namespace LensAF.Items
             if (!(nextItem is IExposureItem)) { return false; }
 
             bool shouldTrigger = false;
-            if (DateTime.Now - AutoFocus.LastAF > new TimeSpan(0, 0, AfterTime))
+            if ((DateTime.Now - AutoFocus.LastAF) > new TimeSpan(0, AfterTime, 0))
             {
                 shouldTrigger = true;
             }
@@ -183,7 +183,7 @@ namespace LensAF.Items
                 Issues.Add("Autofocus already running");
             }
 
-            return Issues.Count > 0;
+            return !(Issues.Count > 0);
         }
 
         private void Rescan()
