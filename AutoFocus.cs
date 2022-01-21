@@ -11,6 +11,7 @@
 
 using Dasync.Collections;
 using EDSDKLib;
+using LensAF.Dockable;
 using LensAF.Properties;
 using LensAF.Util;
 using Newtonsoft.Json;
@@ -23,6 +24,7 @@ using NINA.Equipment.Model;
 using NINA.Image.ImageAnalysis;
 using NINA.Image.Interfaces;
 using NINA.Profile.Interfaces;
+using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,6 +36,7 @@ namespace LensAF
     public class AutoFocus
     {
         public readonly CancellationToken Token;
+        public static CancellationTokenSource PublicToken;
         public readonly IProgress<ApplicationStatus> Progress;
         public static DateTime LastAF;
         public readonly IProfileService Profile;
@@ -58,13 +61,14 @@ namespace LensAF
             DateTime start = DateTime.Now;
             bool Focused = false;
             int iteration = 0;
+            LensAFVM.Instance.AutoFocusIsRunning = true;
             List<FocusPoint> FocusPoints = new List<FocusPoint>();
             try
             {
                 // Needed Variables
-                CancellationTokenSource cts = new CancellationTokenSource();
+                PublicToken = new CancellationTokenSource();
 
-                IAsyncEnumerable<IExposureData> liveViewEnumerable = camera.LiveView(cts.Token);
+                IAsyncEnumerable<IExposureData> liveViewEnumerable = camera.LiveView(PublicToken.Token);
 
                 // LiveView Loop
                 await liveViewEnumerable.ForEachAsync(async _ =>
@@ -74,46 +78,51 @@ namespace LensAF
                         CalibrateLens(canon);
                     }
 
-                    // Break out of loop it it seems like it is stuck
-                    if (iteration > settings.MaxTryCount)
+                    // All Focuspoints are collected: Compute Final Focus Point
+                    if (iteration == settings.Iterations - 1)
                     {
-                        cts.Cancel();
-                    }
-
-                    if (Token.IsCancellationRequested)
-                    {
-                        cts.Cancel();
-                    }
-
-                    // Drive Focus
-                    DriveFocus(canon, FocusDirection.Near);
-                    Logger.Trace($"Moving Focus... iteration {iteration}");
-
-                    // Download and Prepare Image
-                    IExposureData data = await imaging.CaptureImage(new CaptureSequence(
-                        settings.ExposureTime,
-                        "AF Frame",
-                        new FilterInfo(),
-                        new BinningMode(1, 1),
-                        1),
-                        Token, Progress);
-                    StarDetectionResult detection = await PrepareImage(data, settings, imaging);
-                    FocusPoints.Add(new FocusPoint(detection));
-
-                    // Check if focused
-                    if (iteration >= 1)
-                    {
-                        if (detection.AverageHFR > FocusPoints[FocusPoints.Count - 2].HFR)
+                        int iterations = DetermineFinalFocusPoint(FocusPoints, settings.Iterations);
+                        for (int i = 0; i < iterations; i++)
                         {
                             DriveFocus(canon, FocusDirection.Far);
-                            Focused = true;
-                            cts.Cancel();
                         }
+                        Focused = true;
+                        LensAFVM.Instance.AutoFocusIsRunning = false;
+
+                        PublicToken.Cancel();
                     }
 
                     if (Token.IsCancellationRequested)
                     {
-                        cts.Cancel();
+                        LensAFVM.Instance.AutoFocusIsRunning = false;
+                        PublicToken.Cancel();
+                    }
+
+                    if (!Focused)
+                    {
+                        // Drive Focus
+                        DriveFocus(canon, FocusDirection.Near);
+                        Logger.Trace($"Moving Focus... iteration {iteration}");
+
+                        // Download and Prepare Image
+                        IRenderedImage data = await imaging.CaptureAndPrepareImage(new CaptureSequence(
+                            settings.ExposureTime,
+                            "AF Frame",
+                            new FilterInfo(),
+                            new BinningMode(1, 1),
+                            1),
+                            new PrepareImageParameters(true),
+                            Token, Progress);
+                        StarDetectionResult detection = await PrepareImage(data);
+                        FocusPoints.Add(new FocusPoint(detection));
+
+                        AddToPlot(detection, iteration);
+                    }
+
+                    if (Token.IsCancellationRequested)
+                    {
+                        LensAFVM.Instance.AutoFocusIsRunning = false;
+                        PublicToken.Cancel();
                     }
 
                     // Increment iteration
@@ -122,12 +131,65 @@ namespace LensAF
             }
             catch (TaskCanceledException) { }
             catch (OperationCanceledException) { }
+            LensAFVM.Instance.AutoFocusIsRunning = false;
 
             LastAF = DateTime.Now;
-            AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, LastAF - start);
+            AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, LastAF - start, LastAF, StepSizeToString());
             CameraInfo info = new CameraInfo(canon);
             GenerateLog(settings, res, info);
+            if (LensAFVM.Instance != null)
+            {
+                LensAFVM.Instance.LastAF = LastAF.ToString("HH:m");
+            }
             return res;
+        }
+
+        private string StepSizeToString()
+        {
+            if (Settings.Default.UseMixedStepSize)
+            {
+                string logic;
+                if (Settings.Default.StepSizeLogic == 0)
+                {
+                    logic = "+";
+                }
+                else
+                {
+                    logic = "-";
+                }
+                return $"{Settings.Default.StepSizeBig} {logic} {Settings.Default.StepSizeSmall}";
+            }
+            return $"{Settings.Default.SelectedStepSize + 1}";
+        }
+
+        private int DetermineFinalFocusPoint(List<FocusPoint> points, int iterations)
+        {
+            List<double> hfrs = new List<double>();
+            List<double> temp = new List<double>();
+            foreach (FocusPoint point in points)
+            {
+                hfrs.Add(point.HFR);
+                temp.Add(point.HFR);
+            }
+            hfrs.Sort();
+            int iteration;
+            int count = 0;
+
+            do
+            {
+                iteration = temp.IndexOf(hfrs[count]);
+                count++;
+            } while (hfrs[count] == 0);
+            
+            return iterations - iteration;
+        }
+
+        private void AddToPlot(StarDetectionResult detection, int iteration)
+        {
+            if (LensAFVM.Instance != null)
+            {
+                LensAFVM.Instance.AddToPlot(new DataPoint(iteration, detection.AverageHFR));
+            }
         }
 
         private void DriveFocus(IntPtr cam, FocusDirection direction)
@@ -358,9 +420,9 @@ namespace LensAF
             Thread.Sleep(1000); // Wait for focus the finish rotating
         }
 
-        private async Task<StarDetectionResult> PrepareImage(IExposureData exposure, AutoFocusSettings settings, IImagingMediator imaging)
+        private async Task<StarDetectionResult> PrepareImage(IRenderedImage exposure)
         {
-            IImageData imageData = await exposure.ToImageData(Progress, Token);
+            IImageData imageData = exposure.RawImageData;
             System.Windows.Media.PixelFormat pixelFormat;
 
             if (imageData.Properties.IsBayered && Profile.ActiveProfile.ImageSettings.DebayerImage)
@@ -375,12 +437,11 @@ namespace LensAF
             StarDetectionParams analysisParams = new StarDetectionParams
             {
                 Sensitivity = StarSensitivityEnum.Normal,
-                NoiseReduction = NoiseReductionEnum.None
+                NoiseReduction = NoiseReductionEnum.None,
+                IsAutoFocus = true
             };
 
-            IRenderedImage image = await imaging.PrepareImage(imageData, new PrepareImageParameters(), Token);
-            image = await image.Stretch(settings.StretchFactor, settings.BlackClipping, true);
-            StarDetectionResult result = await new StarDetection().Detect(image, pixelFormat, analysisParams, Progress, Token);
+            StarDetectionResult result = await new StarDetection().Detect(exposure, pixelFormat, analysisParams, Progress, Token);
             return result;
         }
 
@@ -407,7 +468,7 @@ namespace LensAF
             {
                 Settings = settings,
                 Result = result,
-                CanonInfo = info
+                CanonInfo = info,
             };
             string ReportDirectory = Path.Combine(CoreUtil.APPLICATIONTEMPPATH, "AutoFocus", "Lens AF");
             if (!Directory.Exists(ReportDirectory))
@@ -417,53 +478,5 @@ namespace LensAF
             string path = Path.Combine(ReportDirectory, DateTime.Now.ToString("yyyy-MM-dd--HH-mm-ss") + ".json");
             File.WriteAllText(path, JsonConvert.SerializeObject(report));
         }
-    }
-
-    public class AutoFocusSettings
-    {
-        public double ExposureTime = 5;
-        public double BlackClipping = -2.8;
-        public double StretchFactor = 0.15;
-        public int MaxTryCount = 15;
-    }
-
-    public class AutoFocusResult
-    {
-        public bool Successfull;
-        public List<FocusPoint> FocusPoints;
-        public TimeSpan Duration;
-        public int StepSize = Settings.Default.SelectedStepSize + 1;
-
-        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration)
-        {
-            Successfull = successfull;
-            FocusPoints = focusPoints;
-            Duration = duration;
-        }
-    }
-
-    public class FocusPoint
-    {
-        public int Stars { get; set; }
-        public double HFR { get; set; }
-
-        public FocusPoint(StarDetectionResult analysis)
-        {
-            Stars = analysis.DetectedStars;
-            HFR = analysis.AverageHFR;
-        }
-    }
-
-    public class AutoFocusReport
-    {
-        public CameraInfo CanonInfo;
-        public AutoFocusSettings Settings;
-        public AutoFocusResult Result;
-    }
-
-    public enum FocusDirection
-    {
-        Far,
-        Near
     }
 }

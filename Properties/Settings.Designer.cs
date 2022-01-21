@@ -37,7 +37,7 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int SelectedStepSize {
             get {
                 return ((int)(this["SelectedStepSize"]));
@@ -61,7 +61,7 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int StepSizeBig {
             get {
                 return ((int)(this["StepSizeBig"]));
@@ -73,7 +73,7 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int StepSizeSmall {
             get {
                 return ((int)(this["StepSizeSmall"]));

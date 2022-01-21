@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.2.0.0")]
-[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyFileVersion("1.3.0.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -46,6 +46,7 @@ If you have questions/feedback/issues, you can ask on the [NINA discord](https:/
 **Requirements**:  
 - A Canon Camera,  
 - A Camera Lens that supports AF
+- The plugin only runs in the advanced sequencer
 
 The plugin was tested using the following camera and lenses:
 - Canon EOS 600d

@@ -12,13 +12,12 @@
 using System.ComponentModel.Composition;
 using System.Windows;
 
-namespace LensAF 
+namespace LensAF.Dockable
 {
-
     [Export(typeof(ResourceDictionary))]
-    partial class Options : ResourceDictionary
+    partial class LensAFDockable : ResourceDictionary
     {
-        public Options() 
+        public LensAFDockable()
         {
             InitializeComponent();
         }

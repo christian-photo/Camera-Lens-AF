@@ -1,7 +1,7 @@
 ﻿#region "copyright"
 
 /*
-    Copyright © 2021 Christian Palm (christian@palm-family.de)
+    Copyright © 2022 Christian Palm (christian@palm-family.de)
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -9,9 +9,11 @@
 
 #endregion "copyright"
 
+using LensAF.Dockable;
 using LensAF.Properties;
 using NINA.Core;
 using NINA.Core.Utility;
+using NINA.Core.Utility.Notification;
 using NINA.Plugin;
 using NINA.Plugin.Interfaces;
 using System.ComponentModel.Composition;
@@ -30,6 +32,11 @@ namespace LensAF
                 Settings.Default.UpdateSettings = false;
                 CoreUtil.SaveSettings(Settings.Default);
             }
+            ResetAF = new RelayCommand(_ =>
+            {
+                LensAFVM.Instance.AutoFocusIsRunning = false;
+                Notification.ShowInformation($"Auto focus is running: {LensAFVM.Instance.AutoFocusIsRunning}");
+            });
         }
 
         public int SelectedIndex
@@ -109,5 +116,7 @@ namespace LensAF
                 CoreUtil.SaveSettings(Settings.Default);
             }
         }
+
+        public RelayCommand ResetAF { get; set; }
     }
 }

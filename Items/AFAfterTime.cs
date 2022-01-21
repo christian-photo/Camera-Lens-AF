@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using LensAF.Dockable;
 using LensAF.Properties;
 using LensAF.Util;
 using Newtonsoft.Json;
@@ -46,7 +47,6 @@ namespace LensAF.Items
         private ICameraMediator cam;
         private IImagingMediator imaging;
         private IProfileService profile;
-        private Utility utility;
         private List<IntPtr> ptrs;
         private Dictionary<string, IntPtr> camsTable;
 
@@ -59,8 +59,7 @@ namespace LensAF.Items
             cam = camera;
             this.imaging = imaging;
             this.profile = profile;
-            utility = new Utility();
-            ptrs = utility.GetConnectedCams();
+            ptrs = Utility.GetConnectedCams();
             _cams = new List<string>();
             camsTable = new Dictionary<string, IntPtr>();
 
@@ -123,8 +122,8 @@ namespace LensAF.Items
         {
             if (!Validate())
             {
-                Logger.Error("Could not run AF. Camera not connected!");
-                Notification.ShowWarning("Camera not connected. Skipping AF");
+                Logger.Error("Could not run AF");
+                Notification.ShowWarning("Skipping AF");
                 return;
             }
 
@@ -152,7 +151,7 @@ namespace LensAF.Items
             if (!(nextItem is IExposureItem)) { return false; }
 
             bool shouldTrigger = false;
-            if (DateTime.Now - AutoFocus.LastAF > new TimeSpan(0, 0, AfterTime))
+            if ((DateTime.Now - AutoFocus.LastAF) > new TimeSpan(0, AfterTime, 0))
             {
                 shouldTrigger = true;
             }
@@ -179,12 +178,17 @@ namespace LensAF.Items
                 Issues.Add("Non valid Camera selected");
             }
 
-            return cameraConnected;
+            if (LensAFVM.Instance.AutoFocusIsRunning)
+            {
+                Issues.Add("Autofocus already running");
+            }
+
+            return !(Issues.Count > 0);
         }
 
         private void Rescan()
         {
-            ptrs = utility.GetConnectedCams();
+            ptrs = Utility.GetConnectedCams();
 
             Dictionary<string, IntPtr> dict = new Dictionary<string, IntPtr>();
             List<string> list = new List<string>();
@@ -197,8 +201,8 @@ namespace LensAF.Items
             {
                 foreach (IntPtr ptr in ptrs)
                 {
-                    list.Add(utility.GetCamName(ptr));
-                    dict.Add(utility.GetCamName(ptr), ptr);
+                    list.Add(Utility.GetCamName(ptr));
+                    dict.Add(Utility.GetCamName(ptr), ptr);
                 }
             }
             Cams = list;

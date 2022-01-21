@@ -6,16 +6,16 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="SelectedStepSize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="ExposureTime" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
     <Setting Name="StepSizeBig" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="StepSizeSmall" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="UseMixedStepSize" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

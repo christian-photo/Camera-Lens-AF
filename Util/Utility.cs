@@ -16,9 +16,9 @@ using System.Collections.Generic;
 
 namespace LensAF.Util
 {
-    public class Utility
+    public static class Utility
     {
-        public string GetCamName(IntPtr cam)
+        public static string GetCamName(IntPtr cam)
         {
             uint err = EDSDK.EdsGetDeviceInfo(cam, out EDSDK.EdsDeviceInfo info);
             if (EDSDK.EDS_ERR_OK == err)
@@ -28,7 +28,7 @@ namespace LensAF.Util
             return null;
         }
 
-        public List<IntPtr> GetConnectedCams()
+        public static List<IntPtr> GetConnectedCams()
         {
             List<IntPtr> cams = new List<IntPtr>();
             try

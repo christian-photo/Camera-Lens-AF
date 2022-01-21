@@ -4,47 +4,75 @@
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 -->
-    
+
 <ResourceDictionary
     x:Class="LensAF.Options"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ninactrl="clr-namespace:NINACustomControlLibrary;assembly=NINACustomControlLibrary">
+    <GeometryGroup x:Key="PluginSVG">
+        <PathGeometry Figures="M121.492 117.153c-48.661 0-86.78 60.987-86.78 138.847s38.119 138.847 86.78 138.847    c48.661 0 86.78-60.987 86.78-138.847S170.153 117.153 121.492 117.153z M121.492 377.492c-37.636 0-69.424-55.635-69.424-121.492    s31.788-121.492 69.424-121.492S190.915 190.144 190.915 256S159.127 377.492 121.492 377.492z" FillRule="NonZero" />
+        <PathGeometry Figures="M401.093 108.475h-53.339c-18.661-11.004-39.612-17.356-61.839-17.356H219.97c-11.89-5.569-24.555-8.678-37.733-8.678    h-52.068c-0.814 0-1.544 0.253-2.29 0.463c-2.129-0.16-4.231-0.463-6.388-0.463C54.5 82.441 0 160.301 0 256    s54.5 173.559 121.492 173.559c2.157 0 4.258-0.303 6.388-0.463c0.746 0.21 1.477 0.463 2.29 0.463h52.068    c13.178 0 25.843-3.109 37.733-8.678h65.945c22.227 0 43.178-6.352 61.839-17.356h53.339C462.246 403.525 512 337.347 512 256    S462.246 108.475 401.093 108.475z M121.492 412.203c-57.424 0-104.136-70.072-104.136-156.203S64.068 99.797 121.492 99.797    c57.424 0 104.136 70.072 104.136 156.203S178.915 412.203 121.492 412.203z M215.699 403.778c-1.881 0.283-3.619 1.019-4.9 2.309    c-9.091 3.898-18.648 6.116-28.561 6.116h-8.14c40.684-28.081 68.886-87.449 68.886-156.203s-28.201-128.123-68.886-156.203h8.14    c9.913 0 19.47 2.218 28.561 6.117c1.282 1.289 3.019 2.025 4.9 2.308c41.036 20.97 70.674 79.22 70.674 147.778    S256.735 382.807 215.699 403.778z M285.915 403.525h-39.996C280.54 372.91 303.729 318.319 303.729 256    s-23.189-116.91-57.809-147.525h39.996c67.246 0 121.949 66.178 121.949 147.525S353.161 403.525 285.915 403.525z     M401.093 386.169h-29.989C403.955 355.98 425.22 308.926 425.22 256s-21.265-99.98-54.116-130.169h29.989    c51.585 0 93.551 58.394 93.551 130.169S452.678 386.169 401.093 386.169z" FillRule="NonZero" />
+    </GeometryGroup>
+
     <DataTemplate x:Key="Lens AF_Options">
         <StackPanel DataContext="{Binding}" Orientation="Vertical">
-            
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <TextBlock Text="Auto focus Step Size ->  "/>
-                <ComboBox SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}" Width="150">
-                    <ComboBoxItem Content="Step Size 1" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 2" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 3" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 4" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 5" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 6" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 7" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="Step Size 8" HorizontalAlignment="Stretch"/>
+
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock Text="Auto focus Step Size -&gt;  " />
+                <ComboBox Width="150" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 1" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 2" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 3" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 4" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 5" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 6" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 7" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 8" />
                 </ComboBox>
             </StackPanel>
-            
-            <StackPanel Orientation="Horizontal" Margin="10,10,10,20">
-                <TextBlock Text="Use mixed step size:" Margin="0,2,0,0"/>
-                <CheckBox IsChecked="{Binding UseMixedStepSize}" Width="100" Margin="0,0,0,2"/>
-                <TextBlock Text="  Big Steps:" Margin="0,2,0,0"/>
-                <ninactrl:UnitTextBox Text="{Binding StepSizeBig}" Width="50" Margin="5,0,0,5"/>
-                <ComboBox SelectedIndex="{Binding StepSizeLogic, Mode=TwoWay}" Width="Auto" Height="22" Margin="10,0,10,5">
-                    <ComboBoxItem Content="+" HorizontalAlignment="Stretch"/>
-                    <ComboBoxItem Content="-" HorizontalAlignment="Stretch"/>
+
+            <StackPanel Margin="10,10,10,20" Orientation="Horizontal">
+                <TextBlock Margin="0,2,0,0" Text="Use mixed step size:" />
+                <CheckBox
+                    Width="100"
+                    Margin="0,0,0,2"
+                    IsChecked="{Binding UseMixedStepSize}" />
+                <TextBlock Margin="0,2,0,0" Text="  Big Steps:" />
+                <ninactrl:UnitTextBox
+                    Width="50"
+                    Margin="5,0,0,5"
+                    Text="{Binding StepSizeBig}" />
+                <ComboBox
+                    Width="Auto"
+                    Height="22"
+                    Margin="10,0,10,5"
+                    SelectedIndex="{Binding StepSizeLogic, Mode=TwoWay}">
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="+" />
+                    <ComboBoxItem HorizontalAlignment="Stretch" Content="-" />
                 </ComboBox>
-                <TextBlock Text="  Small Steps:" Margin="0,2,0,0"/>
-                <ninactrl:UnitTextBox Text="{Binding StepSizeSmall}" Width="50" Margin="5,0,0,5"/>
+                <TextBlock Margin="0,2,0,0" Text="  Small Steps:" />
+                <ninactrl:UnitTextBox
+                    Width="50"
+                    Margin="5,0,0,5"
+                    Text="{Binding StepSizeSmall}" />
             </StackPanel>
-            
-            
-            <StackPanel Orientation="Horizontal" Margin="10">
-                <TextBlock Text="Exposure Time ->  "/>
-                <ninactrl:UnitTextBox Text="{Binding ExposureTime, Mode=TwoWay}" Width="150" Unit="s"/>
+
+
+            <StackPanel Margin="10" Orientation="Horizontal">
+                <TextBlock Text="Exposure Time -&gt;  " />
+                <ninactrl:UnitTextBox
+                    Width="150"
+                    Text="{Binding ExposureTime, Mode=TwoWay}"
+                    Unit="s" />
             </StackPanel>
+            <Button
+                Width="200"
+                Height="30"
+                Margin="10"
+                HorizontalAlignment="Left"
+                Command="{Binding ResetAF}"
+                Content="Reset Auto focus is running" />
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>
