@@ -9,6 +9,8 @@
 
 #endregion "copyright"
 
+using LensAF.Properties;
+using NINA.Core.Utility;
 using NINA.Image.ImageAnalysis;
 using System;
 using System.Collections.Generic;
@@ -17,10 +19,11 @@ namespace LensAF.Util
 {
     public class AutoFocusSettings
     {
-        public double ExposureTime = 5;
+        public double ExposureTime = Settings.Default.ExposureTime;
         public double BlackClipping = -2.8;
         public double StretchFactor = 0.15;
         public int Iterations = 9;
+        public AutoFocusLogic AutoFocusMethod = AutoFocusLogic.STARHFR;
     }
 
     public class AutoFocusResult
@@ -43,13 +46,19 @@ namespace LensAF.Util
 
     public class FocusPoint
     {
-        public int Stars { get; set; }
-        public double HFR { get; set; }
+        public int Stars { get; set; } = 0;
+        public double HFR { get; set; } = double.NaN;
+        public double Contrast { get; set; } = double.NaN;
 
         public FocusPoint(StarDetectionResult analysis)
         {
             Stars = analysis.DetectedStars;
             HFR = analysis.AverageHFR;
+        }
+
+        public FocusPoint(ContrastDetectionResult detection)
+        {
+            Contrast = detection.AverageContrast;
         }
     }
 
@@ -64,5 +73,11 @@ namespace LensAF.Util
     {
         Far,
         Near
+    }
+
+    public enum AutoFocusLogic
+    {
+        STARHFR,
+        CONTRAST
     }
 }

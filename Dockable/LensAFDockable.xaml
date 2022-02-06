@@ -12,22 +12,6 @@
     xmlns:oxy="http://oxyplot.org/wpf"
     xmlns:wpfutil="clr-namespace:NINA.WPF.Base.Utility;assembly=NINA.WPF.Base">
 
-    <DrawingImage x:Key="reload">
-        <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V489.711 H489.711 V0 H0 Z">
-                <DrawingGroup.Transform>
-                    <TranslateTransform X="0" Y="0.00013188393495511264" />
-                </DrawingGroup.Transform>
-                <DrawingGroup Opacity="1">
-                    <DrawingGroup Opacity="1">
-                        <GeometryDrawing Brush="White" Geometry="F1 M489.711,489.711z M0,0z M112.156,97.111C184.456,31.711,292.656,30.711,365.956,90.411L307.856,92.611C300.356,92.911 294.556,99.111 294.856,106.611 295.156,113.911 301.156,119.611 308.356,119.611 308.556,119.611 308.656,119.611 308.856,119.611L398.056,116.311C405.356,116.011,411.056,110.111,411.056,102.811L411.056,101.811C411.056,101.611,411.056,101.511,411.056,101.311L411.056,101.211 411.056,101.211 407.756,13.011C407.456,5.51100000000001 401.156,-0.288999999999991 393.756,0.0110000000000099 386.256,0.31100000000001 380.456,6.51100000000001 380.756,14.011L382.856,69.311C346.556,39.611 301.856,22.411 254.056,20.011 194.856,17.011 137.956,37.311 94.056,77.111 33.656,131.811 8.05599999999998,215.011 27.256,294.211 28.756,300.411 34.256,304.511 40.356,304.511 41.456,304.511 42.456,304.411 43.556,304.111 50.756,302.311 55.256,295.011 53.456,287.811 36.656,218.211 59.056,145.111 112.156,97.111z" />
-                        <GeometryDrawing Brush="White" Geometry="F1 M489.711,489.711z M0,0z M462.456,195.511C460.656,188.311 453.356,183.811 446.156,185.611 438.956,187.411 434.456,194.711 436.256,201.911 453.156,271.511 430.656,344.611 377.556,392.611 340.256,426.311 293.456,442.911 246.856,442.911 202.356,442.911 157.956,427.811 122.156,398.011L180.956,392.711C188.356,392.011 193.856,385.511 193.156,378.011 192.456,370.511 185.956,365.111 178.456,365.811L89.556,373.811C82.156,374.511,76.656,381.011,77.356,388.511L85.356,477.411C85.956,484.411 91.856,489.711 98.756,489.711 99.156,489.711 99.556,489.711 99.956,489.611 107.356,488.911 112.856,482.411 112.156,474.911L107.356,420.811C143.656,450.211 188.156,467.311 235.656,469.711 239.456,469.911 243.256,470.011 246.956,470.011 302.056,470.011 354.456,449.811 395.656,412.611 456.056,357.911 481.656,274.811 462.456,195.511z" />
-                    </DrawingGroup>
-                </DrawingGroup>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-
     <DataTemplate x:Key="LensAF.Dockable.LensAFVM_Dockable">
         <DataTemplate.Resources>
             <ResourceDictionary>
@@ -84,6 +68,13 @@
                         DataFieldY="HFR"
                         ItemsSource="{Binding PlotFocusPoints}"
                         Color="{Binding Path=Color, Source={StaticResource ButtonBackgroundBrush}}" />
+                    <oxy:ScatterErrorSeries
+                        DataFieldX="Iteration"
+                        DataFieldY="HFR"
+                        ItemsSource="{Binding PlotDots}"
+                        MarkerFill="{Binding Path=Color, Source={StaticResource PrimaryBrush}}"
+                        MarkerType="Circle"
+                        Color="{Binding Path=Color, Source={StaticResource ButtonBackgroundBrush}}" />
                 </oxy:Plot.Series>
             </oxy:Plot>
             <StackPanel VerticalAlignment="Bottom" Orientation="Vertical">
@@ -91,23 +82,6 @@
                 <StackPanel Margin="5,0,0,0" Orientation="Horizontal">
                     <TextBlock FontSize="19" Text="Last AF: " />
                     <TextBlock FontSize="19" Text="{Binding LastAF}" />
-                </StackPanel>
-
-                <StackPanel
-                    Margin="5"
-                    HorizontalAlignment="Stretch"
-                    Orientation="Horizontal">
-                    <ComboBox ItemsSource="{Binding Cams}" SelectedIndex="{Binding Index, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                    <Button
-                        Width="26"
-                        Height="26"
-                        Command="{Binding Path=Reload}"
-                        ToolTip="Rescan for cameras">
-
-                        <Image Margin="2,2,2,2" Source="{StaticResource reload}" />
-
-                    </Button>
                 </StackPanel>
 
                 <Button

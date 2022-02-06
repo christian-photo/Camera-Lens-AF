@@ -11,17 +11,22 @@
 
 using LensAF.Dockable;
 using LensAF.Properties;
-using NINA.Core;
+using LensAF.Util;
+using Newtonsoft.Json;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Plugin;
 using NINA.Plugin.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Numerics;
 
 namespace LensAF
 {
     [Export(typeof(IPluginManifest))]
-    public class LensAF : PluginBase
+    public class LensAF : PluginBase, INotifyPropertyChanged
     {
         [ImportingConstructor]
         public LensAF()
@@ -37,7 +42,34 @@ namespace LensAF
                 LensAFVM.Instance.AutoFocusIsRunning = false;
                 Notification.ShowInformation($"Auto focus is running: {LensAFVM.Instance.AutoFocusIsRunning}");
             });
+            if (string.IsNullOrWhiteSpace(Settings.Default.AutoFocusProfiles))
+            {
+                Profiles = new List<AutoFocusProfile>();
+                Profiles.Add(new AutoFocusProfile(0, 2));
+                Profiles.Add(new AutoFocusProfile(1, 0));
+                SaveProfile();
+            }
+            else
+            {
+                Profiles = JsonConvert.DeserializeObject<List<AutoFocusProfile>>(Settings.Default.AutoFocusProfiles);
+            }
         }
+
+        private Dictionary<int, Vector2> StepSizes = new Dictionary<int, Vector2>()
+        {
+            { 0, new Vector2(0, 1) },
+            { 1, new Vector2(0, 3) },
+            { 2, new Vector2(0, 5) },
+            { 3, new Vector2(1, -5) },
+            { 4, new Vector2(1, -3) },
+            { 5, new Vector2(1, 0) },
+            { 6, new Vector2(1, 3) },
+            { 7, new Vector2(1, 5) }
+        };
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static List<AutoFocusProfile> Profiles;
 
         public int SelectedIndex
         {
@@ -49,6 +81,7 @@ namespace LensAF
             {
                 Settings.Default.SelectedStepSize = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                SetStepSize();
             }
         }
 
@@ -75,6 +108,8 @@ namespace LensAF
             {
                 Settings.Default.StepSizeBig = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StepSizeBig)));
+                SaveProfile();
             }
         }
 
@@ -88,6 +123,8 @@ namespace LensAF
             {
                 Settings.Default.StepSizeSmall = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StepSizeSmall)));
+                SaveProfile();
             }
         }
 
@@ -101,6 +138,7 @@ namespace LensAF
             {
                 Settings.Default.UseMixedStepSize = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UseMixedStepSize)));
             }
         }
 
@@ -114,9 +152,126 @@ namespace LensAF
             {
                 Settings.Default.StepSizeLogic = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StepSizeLogic)));
+            }
+        }
+
+        public int AutoFocusLogic
+        {
+            get 
+            { 
+                return Settings.Default.AutoFocusLogic;
+            }
+            set
+            {
+                Settings.Default.AutoFocusLogic = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
+
+        public bool ButtonEnabled
+        {
+            get 
+            { 
+                return Settings.Default.ButtonEnabled; 
+            }
+            set
+            {
+                Settings.Default.ButtonEnabled = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ButtonEnabled)));
+            }
+        }
+
+        public bool PrepareImage
+        {
+            get
+            {
+                return Settings.Default.PrepareImage;
+            }
+            set
+            {
+                Settings.Default.PrepareImage = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
+
+        public double Stretchfactor
+        {
+            get
+            {
+                return Settings.Default.Stretchfactor;
+            }
+            set
+            {
+                Settings.Default.Stretchfactor = value;
+                CoreUtil.SaveSettings(Settings.Default);
+            }
+        }
+
+        public double Blackclipping
+        {
+            get
+            {
+                return Settings.Default.Blackclipping;
+            }
+            set
+            {
+                Settings.Default.Blackclipping = value;
+                CoreUtil.SaveSettings(Settings.Default);
             }
         }
 
         public RelayCommand ResetAF { get; set; }
+
+        private void SetStepSize()
+        {
+            Vector2 stepSize;
+            if (Settings.Default.SelectedStepSize < 8)
+            {
+                stepSize = StepSizes[Settings.Default.SelectedStepSize];
+                ButtonEnabled = true;
+            }
+            else if (Settings.Default.SelectedStepSize == 8)
+            {
+                stepSize = new Vector2(Profiles[0].StepsBig, Profiles[0].StepsSmall);
+                UseMixedStepSize = true;
+                ButtonEnabled = false;
+            }
+            else
+            {
+                stepSize = new Vector2(Profiles[1].StepsBig, Profiles[1].StepsSmall);
+                UseMixedStepSize = true;
+                ButtonEnabled = false;
+            }
+
+            if (stepSize.Y < 0)
+            {
+                StepSizeLogic = 1;
+            }
+            else
+            {
+                StepSizeLogic = 0;
+            }
+            stepSize.Y = Math.Abs(stepSize.Y);
+            StepSizeBig = (int)stepSize.X;
+            StepSizeSmall = (int)stepSize.Y;
+        }
+
+        private void SaveProfile()
+        {
+            if (Settings.Default.SelectedStepSize == 8)
+            {
+                Profiles[0].StepsBig = StepSizeBig;
+                Profiles[0].StepsSmall = StepSizeSmall;
+            }
+            else if (Settings.Default.SelectedStepSize == 9)
+            {
+                Profiles[1].StepsBig = StepSizeBig;
+                Profiles[1].StepsSmall = StepSizeSmall;
+            }
+            Settings.Default.AutoFocusProfiles = JsonConvert.SerializeObject(Profiles);
+            CoreUtil.SaveSettings(Settings.Default);
+        }
     }
 }

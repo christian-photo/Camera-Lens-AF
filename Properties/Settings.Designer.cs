@@ -106,5 +106,77 @@ namespace LensAF.Properties {
                 this["StepSizeLogic"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AutoFocusLogic {
+            get {
+                return ((int)(this["AutoFocusLogic"]));
+            }
+            set {
+                this["AutoFocusLogic"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AutoFocusProfiles {
+            get {
+                return ((string)(this["AutoFocusProfiles"]));
+            }
+            set {
+                this["AutoFocusProfiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ButtonEnabled {
+            get {
+                return ((bool)(this["ButtonEnabled"]));
+            }
+            set {
+                this["ButtonEnabled"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool PrepareImage {
+            get {
+                return ((bool)(this["PrepareImage"]));
+            }
+            set {
+                this["PrepareImage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.12")]
+        public double Stretchfactor {
+            get {
+                return ((double)(this["Stretchfactor"]));
+            }
+            set {
+                this["Stretchfactor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-2.8")]
+        public double Blackclipping {
+            get {
+                return ((double)(this["Blackclipping"]));
+            }
+            set {
+                this["Blackclipping"] = value;
+            }
+        }
     }
 }

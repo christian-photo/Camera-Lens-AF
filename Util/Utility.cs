@@ -11,49 +11,43 @@
 
 using EDSDKLib;
 using NINA.Core.Utility;
+using NINA.Core.Utility.Notification;
+using NINA.Equipment.Equipment.MyCamera;
+using NINA.Equipment.Interfaces.Mediator;
+using NINA.WPF.Base.Mediator;
+using NINA.WPF.Base.ViewModel.Equipment.Camera;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace LensAF.Util
 {
     public static class Utility
     {
-        public static string GetCamName(IntPtr cam)
+        public static object GetInstanceField<T>(T instance, string fieldName)
         {
-            uint err = EDSDK.EdsGetDeviceInfo(cam, out EDSDK.EdsDeviceInfo info);
-            if (EDSDK.EDS_ERR_OK == err)
-            {
-                return info.szDeviceDescription;
-            }
-            return null;
+            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField;
+            FieldInfo field = typeof(T).GetField(fieldName, bindFlags);
+            return field.GetValue(instance);
         }
-
-        public static List<IntPtr> GetConnectedCams()
+        public static IntPtr GetCamera(ICameraMediator camera)
         {
-            List<IntPtr> cams = new List<IntPtr>();
             try
             {
-                IntPtr devices;
-                uint err = EDSDK.EdsGetCameraList(out devices);
-                if (err == EDSDK.EDS_ERR_OK)
+                CameraVM cameraVM = (CameraVM)GetInstanceField((CameraMediator)camera, "handler");
+
+                if (cameraVM.CameraChooserVM.SelectedDevice.Category != "Canon")
                 {
-                    int count;
-                    err = EDSDK.EdsGetChildCount(devices, out count);
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        IntPtr cam;
-                        err = EDSDK.EdsGetChildAtIndex(devices, i, out cam);
-
-                        cams.Add(cam);
-                    }
+                    Notification.ShowError("No canon camera connected");
+                    return IntPtr.Zero;
                 }
-            }
-            catch (Exception e)
+                return (IntPtr)GetInstanceField((EDCamera)cameraVM.CameraChooserVM.SelectedDevice, "_cam");
+            } catch (Exception e)
             {
                 Logger.Error(e);
+                Notification.ShowError(e.Message);
+                return IntPtr.Zero;
             }
-            return cams;
         }
     }
 }

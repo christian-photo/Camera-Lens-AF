@@ -9,15 +9,21 @@
 
 #endregion "copyright"
 
+using Dasync.Collections;
+using EDSDKLib;
 using LensAF.Util;
 using NINA.Core.Model;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces.Mediator;
 using NINA.Equipment.Interfaces.ViewModel;
+using NINA.Image.Interfaces;
 using NINA.Profile.Interfaces;
+using NINA.WPF.Base.Mediator;
 using NINA.WPF.Base.ViewModel;
+using NINA.WPF.Base.ViewModel.Equipment.Camera;
 using OxyPlot;
+using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -32,15 +38,12 @@ namespace LensAF.Dockable
     {
         private readonly ICameraMediator Camera;
         private readonly IImagingMediator Imaging;
-        private List<IntPtr> cameraPtrs;
-        private Dictionary<string, IntPtr> camsTable;
         private CancellationTokenSource ActiveToken;
         private List<string> Issues;
 
 
         public static LensAFVM Instance;
         public AsyncCommand<bool> RunAF { get; set; }
-        public RelayCommand Reload { get; set; }
         public RelayCommand AbortAF { get; set; }
 
         private List<DataPoint> _plotFocusPoints;
@@ -54,6 +57,17 @@ namespace LensAF.Dockable
             }
         }
 
+        private List<ScatterErrorPoint> _plotDots;
+        public List<ScatterErrorPoint> PlotDots
+        {
+            get { return _plotDots; }
+            set
+            {
+                _plotDots = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private string _lastAF = "";
         public string LastAF
         {
@@ -61,28 +75,6 @@ namespace LensAF.Dockable
             set
             {
                 _lastAF = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private List<string> _cams;
-        public List<string> Cams
-        {
-            get { return _cams; }
-            set
-            {
-                _cams = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private int _index = 0;
-        public int Index
-        {
-            get { return _index; }
-            set
-            {
-                _index = value;
                 RaisePropertyChanged();
             }
         }
@@ -110,10 +102,9 @@ namespace LensAF.Dockable
             Camera = camera;
             Imaging = imagingMediator;
             Issues = new List<string>();
-            _cams = new List<string>();
-            camsTable = new Dictionary<string, IntPtr>();
             Instance = this;
             PlotFocusPoints = new List<DataPoint>();
+            PlotDots = new List<ScatterErrorPoint>();
 
             RunAF = new AsyncCommand<bool>(async () =>
             {
@@ -131,17 +122,12 @@ namespace LensAF.Dockable
                     ActiveToken = new CancellationTokenSource();
                     ApplicationStatus status = GetStatus(string.Empty);
                     AutoFocusIsRunning = true;
-                    AutoFocusResult result = await new AutoFocus(ActiveToken.Token, new Progress<ApplicationStatus>(p => status = p), profileService).RunAF(GetSelectedDevice(), Camera, Imaging, new AutoFocusSettings());
+                    AutoFocusResult result = await new AutoFocus(ActiveToken.Token, new Progress<ApplicationStatus>(p => status = p), profileService).RunAF(Camera, Imaging, new AutoFocusSettings());
                     AutoFocusIsRunning = false;
                     return result.Successfull;
                 }
 
                 return false;
-            });
-
-            Reload = new RelayCommand(_ =>
-            {
-                Rescan();
             });
 
             AbortAF = new RelayCommand(_ =>
@@ -161,42 +147,11 @@ namespace LensAF.Dockable
                     AutoFocusIsRunning = false;
                 }
             });
-
-            Rescan(); 
-        }
-
-        private IntPtr GetSelectedDevice()
-        {
-            return camsTable[Cams[Index]];
         }
 
         private ApplicationStatus GetStatus(string status)
         {
             return new ApplicationStatus() { Source = "Lens AF", Status = status };
-        }
-
-        private void Rescan()
-        {
-            cameraPtrs = Utility.GetConnectedCams();
-
-            Dictionary<string, IntPtr> dict = new Dictionary<string, IntPtr>();
-            List<string> list = new List<string>();
-
-            if (cameraPtrs.Count == 0)
-            {
-                list.Add("No Camera Connected");
-            }
-            else
-            {
-                foreach (IntPtr ptr in cameraPtrs)
-                {
-                    list.Add(Utility.GetCamName(ptr));
-                    dict.Add(Utility.GetCamName(ptr), ptr);
-                }
-            }
-            Cams = list;
-            camsTable = dict;
-            Index = 0;
         }
 
         private bool Validate()
@@ -209,22 +164,25 @@ namespace LensAF.Dockable
                 Issues.Add("Camera not connected");
             }
 
-            if (Cams[Index].Equals("No Camera Connected") && Issues.Count == 0)
-            {
-                Issues.Add("Non valid Camera selected");
-            }
-
             if (AutoFocusIsRunning)
             {
                 Issues.Add("Autofocus already running");
             }
 
+            CameraVM cameraVM = (CameraVM)Utility.GetInstanceField((CameraMediator)Camera, "handler");
+
+            if (cameraVM.CameraChooserVM.SelectedDevice.Category != "Canon")
+            {
+                Issues.Add("No canon camera connected");
+            }
+
             return !(Issues.Count > 0);
         }
 
-        private void ClearCharts() 
+        private void ClearCharts()
         {
             PlotFocusPoints = new List<DataPoint>();
+            PlotDots = new List<ScatterErrorPoint>();
         }
 
         public void AddToPlot(DataPoint point)
@@ -232,6 +190,14 @@ namespace LensAF.Dockable
             List<DataPoint> points = PlotFocusPoints;
             points.Add(point);
             PlotFocusPoints = points;
+            AddToDotPlot(point);
         }
+        private void AddToDotPlot(DataPoint point)
+        {
+            List<ScatterErrorPoint> points = PlotDots;
+            PlotDots.Add(new ScatterErrorPoint(point.X, point.Y, 0, 0.1));
+            PlotDots = points;
+        }
+
     }
 }

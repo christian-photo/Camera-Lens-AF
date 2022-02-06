@@ -23,5 +23,23 @@
     <Setting Name="StepSizeLogic" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="AutoFocusLogic" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="AutoFocusProfiles" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ButtonEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PrepareImage" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Stretchfactor" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.12</Value>
+    </Setting>
+    <Setting Name="Blackclipping" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">-2.8</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
