@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.5.0.0")]
-[assembly: AssemblyFileVersion("1.5.0.0")]
+[assembly: AssemblyVersion("1.5.1.0")]
+[assembly: AssemblyFileVersion("1.5.1.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -46,7 +46,7 @@ If you have questions/feedback/issues, you can ask on the [NINA discord](https:/
 **Requirements**:  
 - A Canon Camera,  
 - A Camera Lens that supports AF
-- The plugin only runs in the advanced sequencer
+- The plugin only runs in the advanced sequencer and the imaging tab
 
 The plugin was tested using the following camera and lenses:
 - Canon EOS 600d
@@ -62,8 +62,8 @@ Known issues:
 
 #Troubleshooting:
 What to try if:
-- ...the focus doesn't move: Try a different step size (6 always worked for me) or try switching your lens from AF/MF to MF/AF
-- ...the plugin didn't result in good focus: Try a different step size (6 always worked for me)")]
+- ...the focus doesn't move: Try a different step size (2 always worked for me) or try switching your lens from AF/MF to MF/AF
+- ...the plugin didn't result in good focus: Try a different step size (2 always worked for me)")]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible

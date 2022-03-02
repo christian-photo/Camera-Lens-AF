@@ -72,10 +72,18 @@ namespace LensAF
             if (canon == IntPtr.Zero)
             {
                 Notification.ShowError("Could not run AF: No canon camera connected");
+                ReportUpdate(string.Empty);
                 return new AutoFocusResult(false, new List<FocusPoint>(), TimeSpan.Zero, DateTime.Now, StepSizeToString());
             }
 
-
+            EDSDK.EdsGetPropertyData(canon, 0x00000416, 0, out uint HasLens); // Check if a lens is attached
+            if (HasLens == 0)
+            {
+                Notification.ShowError("Can't start AF: No lens attached");
+                Logger.Error("Can't start AF: No lens attached");
+                ReportUpdate(string.Empty);
+                return new AutoFocusResult(false, new List<FocusPoint>(), TimeSpan.Zero, DateTime.Now, StepSizeToString());
+            }
             DateTime start = DateTime.Now;
             bool Focused = false;
             int iteration = 0;
@@ -94,12 +102,14 @@ namespace LensAF
                 {
                     if (iteration == 0)
                     {
+                        ReportUpdate("Calibrating lens");
                         CalibrateLens(canon);
                     }
 
                     // All Focuspoints are collected: Compute Final Focus Point
                     if (iteration == settings.Iterations - 1)
                     {
+                        ReportUpdate("Finishing Autofocus");
                         int iterations = DetermineFinalFocusPoint(FocusPoints, settings.Iterations);
                         for (int i = 0; i < iterations; i++)
                         {
@@ -108,11 +118,13 @@ namespace LensAF
                         Focused = true;
                         LensAFVM.Instance.AutoFocusIsRunning = false;
 
+                        ReportUpdate(string.Empty);
                         PublicToken.Cancel();
                     }
 
                     if (Token.IsCancellationRequested)
                     {
+                        ReportUpdate(string.Empty);
                         LensAFVM.Instance.AutoFocusIsRunning = false;
                         PublicToken.Cancel();
                     }
@@ -120,10 +132,12 @@ namespace LensAF
                     if (!Focused)
                     {
                         // Drive Focus
+                        ReportUpdate($"Moving focus, iteration {iteration + 1}");
                         DriveFocus(canon, FocusDirection.Near);
                         Logger.Trace($"Moving Focus... iteration {iteration}");
 
                         // Download and Prepare Image
+                        ReportUpdate("Capturing image and detecting stars");
                         IRenderedImage data = await imaging.CaptureAndPrepareImage(new CaptureSequence(
                             settings.ExposureTime,
                             "AF Frame",
@@ -151,6 +165,7 @@ namespace LensAF
 
                     if (Token.IsCancellationRequested)
                     {
+                        ReportUpdate(string.Empty);
                         LensAFVM.Instance.AutoFocusIsRunning = false;
                         PublicToken.Cancel();
                     }
@@ -171,7 +186,13 @@ namespace LensAF
             {
                 LensAFVM.Instance.LastAF = LastAF.ToString("HH:m");
             }
+            ReportUpdate(string.Empty);
             return res;
+        }
+
+        private void ReportUpdate(string update)
+        {
+            Progress?.Report(new ApplicationStatus() { Status = update });
         }
 
         private AutoFocusLogic GetSelectedLogic()
@@ -564,12 +585,6 @@ namespace LensAF
             return new Util.ContrastDetection().Measure(image, exposure, analysisParams, Progress, Token);
         }
 
-        /// <summary>
-        ///     This Calibrates the lens to the complete right (infinite)
-        ///     Camera has to be in Live View!
-        /// </summary>
-        /// <param name="ptr">IntPtr for the camera</param>
-        /// <returns></returns>
         private void CalibrateLens(IntPtr ptr)
         {
             int i = 0;

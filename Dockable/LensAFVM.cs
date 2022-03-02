@@ -19,6 +19,7 @@ using NINA.Equipment.Interfaces.Mediator;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
 using NINA.Profile.Interfaces;
+using NINA.WPF.Base.Interfaces.Mediator;
 using NINA.WPF.Base.Mediator;
 using NINA.WPF.Base.ViewModel;
 using NINA.WPF.Base.ViewModel.Equipment.Camera;
@@ -40,6 +41,8 @@ namespace LensAF.Dockable
         private readonly IImagingMediator Imaging;
         private CancellationTokenSource ActiveToken;
         private List<string> Issues;
+        private ApplicationStatus _status;
+        private IApplicationStatusMediator statusMediator;
 
 
         public static LensAFVM Instance;
@@ -90,8 +93,21 @@ namespace LensAF.Dockable
             }
         }
 
+        public ApplicationStatus Status
+        {
+            get { return _status; }
+            set
+            {
+                _status = value;
+                _status.Source = "Lens AF";
+                RaisePropertyChanged(nameof(Status));
+
+                statusMediator.StatusUpdate(_status);
+            }
+        }
+
         [ImportingConstructor]
-        public LensAFVM(IProfileService profileService, ICameraMediator camera, IImagingMediator imagingMediator) : base(profileService)
+        public LensAFVM(IProfileService profileService, ICameraMediator camera, IImagingMediator imagingMediator, IApplicationStatusMediator statusMediator) : base(profileService)
         {
             Title = "Lens AF";
             ResourceDictionary dict = new ResourceDictionary();
@@ -101,6 +117,7 @@ namespace LensAF.Dockable
 
             Camera = camera;
             Imaging = imagingMediator;
+            this.statusMediator = statusMediator;
             Issues = new List<string>();
             Instance = this;
             PlotFocusPoints = new List<DataPoint>();
@@ -120,9 +137,8 @@ namespace LensAF.Dockable
                 {
                     ClearCharts();
                     ActiveToken = new CancellationTokenSource();
-                    ApplicationStatus status = GetStatus(string.Empty);
                     AutoFocusIsRunning = true;
-                    AutoFocusResult result = await new AutoFocus(ActiveToken.Token, new Progress<ApplicationStatus>(p => status = p), profileService).RunAF(Camera, Imaging, new AutoFocusSettings());
+                    AutoFocusResult result = await new AutoFocus(ActiveToken.Token, new Progress<ApplicationStatus>(p => Status = p), profileService).RunAF(Camera, Imaging, new AutoFocusSettings());
                     AutoFocusIsRunning = false;
                     return result.Successfull;
                 }
@@ -147,11 +163,6 @@ namespace LensAF.Dockable
                     AutoFocusIsRunning = false;
                 }
             });
-        }
-
-        private ApplicationStatus GetStatus(string status)
-        {
-            return new ApplicationStatus() { Source = "Lens AF", Status = status };
         }
 
         private bool Validate()
