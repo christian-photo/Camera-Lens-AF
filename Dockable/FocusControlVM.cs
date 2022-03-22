@@ -40,10 +40,14 @@ namespace LensAF.Dockable
         private bool _manualFocusControl = false;
         private CancellationTokenSource FocusControlToken;
 
+        public static FocusControlVM Instance;
+
         public AsyncCommand<bool> StartFocusControl { get; set; }
         public RelayCommand StopFocusControl { get; set; }
         public RelayCommand MoveLeft { get; set; }
+        public RelayCommand MoveLeftBig { get; set; }
         public RelayCommand MoveRight { get; set; }
+        public RelayCommand MoveRightBig { get; set; }
 
         private BitmapSource image;
         public BitmapSource Image
@@ -70,10 +74,13 @@ namespace LensAF.Dockable
         public FocusControlVM(IProfileService profileService, ICameraMediator cam, IImagingMediator imaging) : base(profileService)
         {
             Camera = cam;
+            Instance = this;
 
             Title = "Manual Focus Control";
-            ResourceDictionary dict = new ResourceDictionary();
-            dict.Source = new Uri("/LensAF;component/Options.xaml", UriKind.RelativeOrAbsolute);
+            ResourceDictionary dict = new ResourceDictionary
+            {
+                Source = new Uri("/LensAF;component/Options.xaml", UriKind.RelativeOrAbsolute)
+            };
             ImageGeometry = (GeometryGroup)dict["PluginSVG"];
             ImageGeometry.Freeze();
 
@@ -85,14 +92,15 @@ namespace LensAF.Dockable
                 {
                     foreach (string issue in Issues)
                     {
-                        Notification.ShowError($"Can't start AutoFocus: {issue}");
-                        Logger.Error($"Can't start AutoFocus: {issue}");
+                        Notification.ShowError($"Can't start Focus Control: {issue}");
+                        Logger.Error($"Can't start Focus Control: {issue}");
                     }
                     return false;
                 }
                 FocusControlToken = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> LiveView = Camera.LiveView(FocusControlToken.Token);
                 ManualFocusControl = true;
+
 
                 await LiveView.ForEachAsync(async exposure => 
                 {
@@ -125,9 +133,19 @@ namespace LensAF.Dockable
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
             });
 
+            MoveRightBig = new RelayCommand(_ => 
+            {
+                EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far2);
+            });
+
             MoveLeft = new RelayCommand(_ =>
             {
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+            });
+
+            MoveLeftBig = new RelayCommand(_ =>
+            {
+                EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
             });
         }
 

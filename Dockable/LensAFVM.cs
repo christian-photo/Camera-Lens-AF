@@ -125,6 +125,7 @@ namespace LensAF.Dockable
 
             RunAF = new AsyncCommand<bool>(async () =>
             {
+
                 if (!Validate())
                 {
                     foreach (string issue in Issues)

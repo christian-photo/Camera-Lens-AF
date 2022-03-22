@@ -11,26 +11,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:wpfutil="clr-namespace:NINA.WPF.Base.Utility;assembly=NINA.WPF.Base">
 
-    <DrawingImage x:Key="ArrowLeft">
-        <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
-                <DrawingGroup Opacity="1">
-                    <GeometryDrawing Brush="White" Geometry="F1 M24,24z M0,0z M16.23,23.58L17.453051,22.393559C17.65025,22.197971,17.65025,21.879147,17.453051,21.683559L8.4852542,12.050847 17.533898,2.189322C17.731097,1.9937336,17.731097,1.6749104,17.533898,1.479322L16.26,0.42C16.064412,0.22280112,15.745588,0.22280112,15.55,0.42L5.2,12 15.52,23.54C15.704268,23.748652,16.023462,23.766635,16.23,23.58z" />
-                </DrawingGroup>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-
-    <DrawingImage x:Key="ArrowRight">
-        <DrawingImage.Drawing>
-            <DrawingGroup ClipGeometry="M0,0 V24 H24 V0 H0 Z">
-                <DrawingGroup Opacity="1">
-                    <GeometryDrawing Brush="White" Geometry="F1 M24,24z M0,0z M6.6517976,0.4011297L5.4287466,1.5875707C5.2315476,1.7831587,5.2315476,2.1019827,5.4287466,2.2975707L14.396543,11.930283 5.3478996,21.791808C5.1507006,21.987396,5.1507006,22.306219,5.3478996,22.501808L6.6217976,23.56113C6.8173856,23.758329,7.1362096,23.758329,7.3317976,23.56113L17.681797,11.98113 7.3617976,0.4411297C7.1775296,0.2324777,6.8583356,0.2144947,6.6517976,0.4011297z" />
-                </DrawingGroup>
-            </DrawingGroup>
-        </DrawingImage.Drawing>
-    </DrawingImage>
-
     <DataTemplate x:Key="LensAF.Dockable.FocusControlVM_Dockable">
         <DataTemplate.Resources>
             <ResourceDictionary>
@@ -41,8 +21,13 @@
             </ResourceDictionary>
         </DataTemplate.Resources>
 
-        <StackPanel VerticalAlignment="Stretch" Orientation="Vertical">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="60" />
+            </Grid.RowDefinitions>
             <Image
+                Grid.Row="0"
                 Width="Auto"
                 Height="Auto"
                 Margin="10"
@@ -50,6 +35,7 @@
 
 
             <StackPanel
+                Grid.Row="1"
                 Margin="0,10,0,10"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"
@@ -60,12 +46,21 @@
                     Margin="10,2,10,2"
                     HorizontalAlignment="Left"
                     HorizontalContentAlignment="Stretch"
+                    Command="{Binding MoveLeftBig}"
+                    Content="&lt;&lt;"
+                    FontSize="20"
+                    IsEnabled="{Binding ManualFocusControl}" />
+
+                <Button
+                    Width="40"
+                    Height="40"
+                    Margin="10,2,10,2"
+                    HorizontalAlignment="Left"
+                    HorizontalContentAlignment="Stretch"
                     Command="{Binding MoveLeft}"
-                    IsEnabled="{Binding ManualFocusControl}">
-
-                    <Image Margin="5" Source="{StaticResource ArrowLeft}" />
-
-                </Button>
+                    Content="&lt;"
+                    FontSize="20"
+                    IsEnabled="{Binding ManualFocusControl}" />
 
                 <Button
                     Width="200"
@@ -93,13 +88,22 @@
                     HorizontalAlignment="Right"
                     HorizontalContentAlignment="Stretch"
                     Command="{Binding MoveRight}"
-                    IsEnabled="{Binding ManualFocusControl}">
+                    Content="&gt;"
+                    FontSize="20"
+                    IsEnabled="{Binding ManualFocusControl}" />
 
-                    <Image Margin="5" Source="{StaticResource ArrowRight}" />
-
-                </Button>
+                <Button
+                    Width="40"
+                    Height="40"
+                    Margin="10,2,10,2"
+                    HorizontalAlignment="Right"
+                    HorizontalContentAlignment="Stretch"
+                    Command="{Binding MoveRightBig}"
+                    Content="&gt;&gt;"
+                    FontSize="20"
+                    IsEnabled="{Binding ManualFocusControl}" />
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </DataTemplate>
 
 </ResourceDictionary>

@@ -10,7 +10,6 @@
 #endregion "copyright"
 
 using LensAF.Properties;
-using NINA.Core.Utility;
 using NINA.Image.ImageAnalysis;
 using System;
 using System.Collections.Generic;
@@ -33,14 +32,16 @@ namespace LensAF.Util
         public TimeSpan Duration;
         public DateTime Time;
         public string StepSize;
+        public FocusPoint FinalFocusPoint;
 
-        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, TimeSpan duration, DateTime time, string stepsize)
+        public AutoFocusResult(bool successfull, List<FocusPoint> focusPoints, FocusPoint FinalFocusPoint, TimeSpan duration, DateTime time, string stepsize)
         {
             Successfull = successfull;
             FocusPoints = focusPoints;
             Duration = duration;
             Time = time;
             StepSize = stepsize;
+            this.FinalFocusPoint = FinalFocusPoint;
         }
     }
 
@@ -49,16 +50,23 @@ namespace LensAF.Util
         public int Stars { get; set; } = 0;
         public double HFR { get; set; } = double.NaN;
         public double Contrast { get; set; } = double.NaN;
+        public int Iteration { get; set; }
 
-        public FocusPoint(StarDetectionResult analysis)
+        public FocusPoint(StarDetectionResult analysis, int iteration)
         {
             Stars = analysis.DetectedStars;
             HFR = analysis.AverageHFR;
+            Iteration = iteration;
         }
 
-        public FocusPoint(ContrastDetectionResult detection)
+        public FocusPoint(ContrastDetectionResult detection, int iteration)
         {
             Contrast = detection.AverageContrast;
+            Iteration = iteration;
+        }
+
+        public FocusPoint()
+        {
         }
     }
 

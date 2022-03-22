@@ -73,7 +73,7 @@ namespace LensAF
             {
                 Notification.ShowError("Could not run AF: No canon camera connected");
                 ReportUpdate(string.Empty);
-                return new AutoFocusResult(false, new List<FocusPoint>(), TimeSpan.Zero, DateTime.Now, StepSizeToString());
+                return new AutoFocusResult(false, new List<FocusPoint>(), new FocusPoint(), TimeSpan.Zero, DateTime.Now, StepSizeToString());
             }
 
             EDSDK.EdsGetPropertyData(canon, 0x00000416, 0, out uint HasLens); // Check if a lens is attached
@@ -82,14 +82,17 @@ namespace LensAF
                 Notification.ShowError("Can't start AF: No lens attached");
                 Logger.Error("Can't start AF: No lens attached");
                 ReportUpdate(string.Empty);
-                return new AutoFocusResult(false, new List<FocusPoint>(), TimeSpan.Zero, DateTime.Now, StepSizeToString());
+                return new AutoFocusResult(false, new List<FocusPoint>(), new FocusPoint(), TimeSpan.Zero, DateTime.Now, StepSizeToString());
             }
             DateTime start = DateTime.Now;
             bool Focused = false;
             int iteration = 0;
             Method = GetSelectedLogic();
             LensAFVM.Instance.AutoFocusIsRunning = true;
+            FocusControlVM.Instance.ManualFocusControl = false;
+
             List<FocusPoint> FocusPoints = new List<FocusPoint>();
+            FocusPoint FinalFocusPoint = null;
             try
             {
                 // Needed Variables
@@ -111,6 +114,7 @@ namespace LensAF
                     {
                         ReportUpdate("Finishing Autofocus");
                         int iterations = DetermineFinalFocusPoint(FocusPoints, settings.Iterations);
+                        FinalFocusPoint = FocusPoints[settings.Iterations - iterations];
                         for (int i = 0; i < iterations; i++)
                         {
                             DriveFocus(canon, FocusDirection.Far);
@@ -150,14 +154,14 @@ namespace LensAF
                         if (Method == AutoFocusLogic.STARHFR)
                         {
                             StarDetectionResult detection = await PrepareImageForStarHFR(data);
-                            FocusPoints.Add(new FocusPoint(detection));
+                            FocusPoints.Add(new FocusPoint(detection, iteration));
 
                             AddToPlot(detection.AverageHFR, iteration);
                         }
                         else
                         {
                             ContrastDetectionResult detection = PrepareImageForContrast(data);
-                            FocusPoints.Add(new FocusPoint(detection));
+                            FocusPoints.Add(new FocusPoint(detection, iteration));
 
                             AddToPlot(detection.AverageContrast, iteration);
                         }
@@ -179,7 +183,7 @@ namespace LensAF
             LensAFVM.Instance.AutoFocusIsRunning = false;
 
             LastAF = DateTime.Now;
-            AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, LastAF - start, LastAF, StepSizeToString());
+            AutoFocusResult res = new AutoFocusResult(Focused, FocusPoints, FinalFocusPoint, LastAF - start, LastAF, StepSizeToString());
             Util.CameraInfo info = new Util.CameraInfo(canon);
             GenerateLog(settings, res, info);
             if (LensAFVM.Instance != null)
@@ -222,7 +226,7 @@ namespace LensAF
             return $"{Settings.Default.SelectedStepSize + 1}";
         }
 
-        private int DetermineFinalFocusPoint(List<FocusPoint> points, int iterations)
+        public int DetermineFinalFocusPoint(List<FocusPoint> points, int iterations)
         {
             int iteration;
             if (Method == AutoFocusLogic.STARHFR)
@@ -235,13 +239,9 @@ namespace LensAF
                     temp.Add(point.HFR);
                 }
                 hfrs.Sort();
-                int count = 0;
 
-                do
-                {
-                    iteration = temp.IndexOf(hfrs[count]);
-                    count++;
-                } while (hfrs[count] == 0);
+                hfrs.RemoveAll(x => x == 0);
+                iteration = temp.IndexOf(hfrs[0]);
             }
             else
             {
@@ -587,12 +587,10 @@ namespace LensAF
 
         private void CalibrateLens(IntPtr ptr)
         {
-            int i = 0;
-            while (i != 7)
+            for (int i = 0; i < 15; i++)
             {
                 EDSDK.EdsSendCommand(ptr, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
                 Thread.Sleep(350); // Let Focus Settle, EDSDK does not wait for the lens to finish moving the focus
-                i++;
             }
         }
 

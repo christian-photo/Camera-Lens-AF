@@ -193,6 +193,7 @@ namespace LensAF
             {
                 Settings.Default.PrepareImage = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PrepareImage)));
             }
         }
 
@@ -206,6 +207,7 @@ namespace LensAF
             {
                 Settings.Default.Stretchfactor = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Stretchfactor)));
             }
         }
 
@@ -219,6 +221,7 @@ namespace LensAF
             {
                 Settings.Default.Blackclipping = value;
                 CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Blackclipping)));
             }
         }
 
