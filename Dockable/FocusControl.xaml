@@ -9,6 +9,7 @@
     x:Class="LensAF.Dockable.FocusControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:LensAF.Dockable"
     xmlns:wpfutil="clr-namespace:NINA.WPF.Base.Utility;assembly=NINA.WPF.Base">
 
     <DataTemplate x:Key="LensAF.Dockable.FocusControlVM_Dockable">
@@ -26,12 +27,15 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
-            <Image
+            <!--<Image
                 Grid.Row="0"
-                Width="Auto"
-                Height="Auto"
                 Margin="10"
-                Source="{Binding Image}" />
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Source="{Binding Image}" />-->
+            <local:ZoomBorder Grid.Row="0" ClipToBounds="True">
+                <Image Source="{Binding Image}" />
+            </local:ZoomBorder>
 
 
             <StackPanel

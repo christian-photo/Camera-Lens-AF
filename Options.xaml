@@ -19,7 +19,7 @@
         <StackPanel DataContext="{Binding}" Orientation="Vertical">
 
             <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Text="Autofocus method -&gt; " />
+                <TextBlock Width="200" Text="Autofocus method" />
                 <ComboBox
                     Width="200"
                     Height="24"
@@ -31,7 +31,7 @@
             </StackPanel>
 
             <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Text="Auto focus Step Size -&gt;  " />
+                <TextBlock Width="200" Text="Auto focus Step Size" />
                 <ComboBox Width="150" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
                     <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 1" />
                     <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 2" />
@@ -47,12 +47,11 @@
             </StackPanel>
 
             <StackPanel Margin="10,10,10,20" Orientation="Horizontal">
-                <TextBlock Margin="0,2,0,0" Text="Use mixed step size:" />
-                <CheckBox
-                    Width="100"
-                    Margin="0,0,0,2"
-                    IsChecked="{Binding UseMixedStepSize}"
-                    IsEnabled="{Binding ButtonEnabled}" />
+                <TextBlock
+                    Width="200"
+                    Margin="0,2,0,0"
+                    Text="Use mixed step size" />
+                <CheckBox IsChecked="{Binding UseMixedStepSize}" IsEnabled="{Binding ButtonEnabled}" />
                 <TextBlock Margin="0,2,0,0" Text="  Big Steps:" />
                 <ninactrl:UnitTextBox
                     Width="50"
@@ -74,11 +73,11 @@
             </StackPanel>
 
             <StackPanel Margin="10,5,5,10" Orientation="Horizontal">
-                <TextBlock Margin="0,2,0,0" Text="Prepare Liveview:" />
-                <CheckBox
-                    Width="100"
-                    Margin="0,0,0,2"
-                    IsChecked="{Binding PrepareImage}" />
+                <TextBlock
+                    Width="200"
+                    Margin="0,2,0,0"
+                    Text="Prepare Liveview" />
+                <CheckBox IsChecked="{Binding PrepareImage}" />
                 <TextBlock Margin="0,2,0,0" Text="  Stretch factor:" />
                 <TextBox
                     Width="50"
@@ -95,7 +94,7 @@
 
 
             <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Text="Exposure Time -&gt;  " />
+                <TextBlock Width="200" Text="Exposure Time" />
                 <ninactrl:UnitTextBox
                     Width="150"
                     Text="{Binding ExposureTime, Mode=TwoWay}"

@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.5.2.0")]
-[assembly: AssemblyFileVersion("1.5.2.0")]
+[assembly: AssemblyVersion("1.5.3.0")]
+[assembly: AssemblyFileVersion("1.5.3.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -52,6 +52,11 @@ The plugin was tested using the following camera and lenses:
 - Canon EOS 600d
 - Canon EF 100-400 f/4.5-5.6 L IS USM
 - Canon EF 24-105 f/4 L IS USM
+
+## Manual Focus Control controls
+- Mousewheel/Trackpad: Zoom in/out
+- Left mousebutton: Pan around
+- Right mousebutton: reset
 
 
 Known issues:
