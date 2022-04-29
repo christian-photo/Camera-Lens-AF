@@ -115,7 +115,7 @@ namespace LensAF
                         ReportUpdate("Finishing Autofocus");
                         int iterations = DetermineFinalFocusPoint(FocusPoints, settings.Iterations);
                         FinalFocusPoint = FocusPoints[settings.Iterations - iterations];
-                        for (int i = 0; i < iterations; i++)
+                        for (int i = 0; i < settings.Iterations - iterations; i++)
                         {
                             DriveFocus(canon, FocusDirection.Far);
                         }
