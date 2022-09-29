@@ -41,5 +41,11 @@
     <Setting Name="Blackclipping" Type="System.Double" Scope="User">
       <Value Profile="(Default)">-2.8</Value>
     </Setting>
+    <Setting Name="Iterations" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">9</Value>
+    </Setting>
+    <Setting Name="InitialOffset" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

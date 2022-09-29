@@ -153,7 +153,7 @@ namespace LensAF.Items
 
             CameraVM cameraVM = (CameraVM)Utility.GetInstanceField((CameraMediator)cam, "handler");
 
-            if (cameraVM.CameraChooserVM.SelectedDevice.Category != "Canon")
+            if (cameraVM.DeviceChooserVM.SelectedDevice.Category != "Canon")
             {
                 Issues.Add("No canon camera connected");
             }

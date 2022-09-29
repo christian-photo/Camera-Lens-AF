@@ -21,7 +21,8 @@ namespace LensAF.Util
         public double ExposureTime = Settings.Default.ExposureTime;
         public double BlackClipping = -2.8;
         public double StretchFactor = 0.15;
-        public int Iterations = 9;
+        public int Iterations = Settings.Default.Iterations;
+        public int InitialOffset = Settings.Default.InitialOffset;
         public AutoFocusLogic AutoFocusMethod = AutoFocusLogic.STARHFR;
     }
 

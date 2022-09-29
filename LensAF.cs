@@ -225,6 +225,27 @@ namespace LensAF
             }
         }
 
+        public int Iterations
+        {
+            get => Settings.Default.Iterations;
+            set
+            {
+                Settings.Default.Iterations = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Iterations)));
+            }
+        }
+
+        public int InitialOffset
+        {
+            get => Settings.Default.InitialOffset;
+            set
+            {
+                Settings.Default.InitialOffset = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitialOffset)));
+            }
+        }
         public RelayCommand ResetAF { get; set; }
 
         private void SetStepSize()

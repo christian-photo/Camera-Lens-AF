@@ -183,12 +183,12 @@ namespace LensAF.Dockable
 
             CameraVM cameraVM = (CameraVM)Utility.GetInstanceField((CameraMediator)Camera, "handler");
 
-            if (cameraVM.CameraChooserVM.SelectedDevice.Category != "Canon")
+            if (cameraVM.DeviceChooserVM.SelectedDevice.Category != "Canon")
             {
                 Issues.Add("No canon camera connected");
             }
 
-            return !(Issues.Count > 0);
+            return Issues.Count == 0;
         }
 
         private void ClearCharts()

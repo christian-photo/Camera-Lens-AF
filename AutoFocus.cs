@@ -106,7 +106,7 @@ namespace LensAF
                     if (iteration == 0)
                     {
                         ReportUpdate("Calibrating lens");
-                        CalibrateLens(canon);
+                        CalibrateLens(canon, settings);
                     }
 
                     // All Focuspoints are collected: Compute Final Focus Point
@@ -115,7 +115,7 @@ namespace LensAF
                         ReportUpdate("Finishing Autofocus");
                         int iterations = DetermineFinalFocusPoint(FocusPoints, settings.Iterations);
                         FinalFocusPoint = FocusPoints[settings.Iterations - iterations];
-                        for (int i = 0; i < settings.Iterations - iterations; i++)
+                        for (int i = 0; i < iterations; i++)
                         {
                             DriveFocus(canon, FocusDirection.Far);
                         }
@@ -138,7 +138,7 @@ namespace LensAF
                         // Drive Focus
                         ReportUpdate($"Moving focus, iteration {iteration + 1}");
                         DriveFocus(canon, FocusDirection.Near);
-                        Logger.Trace($"Moving Focus... iteration {iteration}");
+                        Logger.Debug($"Moving Focus... iteration {iteration}");
 
                         // Download and Prepare Image
                         ReportUpdate("Capturing image and detecting stars");
@@ -585,12 +585,16 @@ namespace LensAF
             return new Util.ContrastDetection().Measure(image, exposure, analysisParams, Progress, Token);
         }
 
-        private void CalibrateLens(IntPtr ptr)
+        private void CalibrateLens(IntPtr ptr, AutoFocusSettings settings)
         {
             for (int i = 0; i < 15; i++)
             {
                 EDSDK.EdsSendCommand(ptr, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
                 Thread.Sleep(350); // Let Focus Settle, EDSDK does not wait for the lens to finish moving the focus
+            }
+            for (int i = 0; i < settings.InitialOffset; i++)
+            {
+                DriveFocus(ptr, FocusDirection.Near);
             }
         }
 
