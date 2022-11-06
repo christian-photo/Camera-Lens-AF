@@ -9,7 +9,7 @@
     x:Class="LensAF.Dockable.LensAFDockable"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Contrib.Wpf"
     xmlns:wpfutil="clr-namespace:NINA.WPF.Base.Utility;assembly=NINA.WPF.Base">
 
     <DataTemplate x:Key="LensAF.Dockable.LensAFVM_Dockable">
