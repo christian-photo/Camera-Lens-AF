@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.5.5.1")]
-[assembly: AssemblyFileVersion("1.5.5.1")]
+[assembly: AssemblyVersion("1.5.5.2")]
+[assembly: AssemblyFileVersion("1.5.5.2")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -48,7 +48,7 @@ If you have questions/feedback/issues, you can ask on the [NINA discord](https:/
 - A Camera Lens that supports AF
 - The plugin only runs in the advanced sequencer and the imaging tab
 
-The plugin was tested using the following camera and lenses:
+The plugin was tested using the following camera and lenses (Note that there are often issues with third-party lenses, so be aware of that):
 - Canon EOS 600d
 - Canon EF 100-400 f/4.5-5.6 L IS USM
 - Canon EF 24-105 f/4 L IS USM
