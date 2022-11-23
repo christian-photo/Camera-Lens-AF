@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.5.5.2")]
-[assembly: AssemblyFileVersion("1.5.5.2")]
+[assembly: AssemblyVersion("1.5.6.1")]
+[assembly: AssemblyFileVersion("1.5.6.1")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
