@@ -113,8 +113,8 @@ namespace LensAF
                     if (iteration == settings.Iterations - 1)
                     {
                         ReportUpdate("Finishing Autofocus");
-                        int iterations = DetermineFinalFocusPoint(FocusPoints, settings.Iterations);
-                        FinalFocusPoint = FocusPoints[settings.Iterations - iterations];
+                        int iterations = DetermineFinalFocusPoint(FocusPoints);
+                        FinalFocusPoint = FocusPoints[iterations];
                         for (int i = 0; i < iterations; i++)
                         {
                             DriveFocus(canon, FocusDirection.Far);
@@ -226,7 +226,7 @@ namespace LensAF
             return $"{Settings.Default.SelectedStepSize + 1}";
         }
 
-        public int DetermineFinalFocusPoint(List<FocusPoint> points, int iterations)
+        public int DetermineFinalFocusPoint(List<FocusPoint> points)
         {
             int iteration;
             if (Method == AutoFocusLogic.STARHFR)
@@ -239,6 +239,7 @@ namespace LensAF
                     temp.Add(point.HFR);
                 }
                 hfrs.Sort();
+                temp.Reverse();
 
                 hfrs.RemoveAll(x => x == 0);
                 iteration = temp.IndexOf(hfrs[0]);
@@ -256,7 +257,7 @@ namespace LensAF
                 iteration = temp.IndexOf(contrasts[contrasts.Count - 1]);
             }
 
-            return iterations - iteration;
+            return iteration;
         }
 
         private void AddToPlot(double detection, int iteration)
