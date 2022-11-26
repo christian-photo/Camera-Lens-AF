@@ -15,6 +15,7 @@ using LensAF.Util;
 using Newtonsoft.Json;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
+using NINA.Equipment.Interfaces.Mediator;
 using NINA.Plugin;
 using NINA.Plugin.Interfaces;
 using System;
@@ -29,7 +30,7 @@ namespace LensAF
     public class LensAF : PluginBase, INotifyPropertyChanged
     {
         [ImportingConstructor]
-        public LensAF()
+        public LensAF(ICameraMediator camera)
         {
             if (Settings.Default.UpdateSettings)
             {
@@ -53,6 +54,7 @@ namespace LensAF
             {
                 Profiles = JsonConvert.DeserializeObject<List<AutoFocusProfile>>(Settings.Default.AutoFocusProfiles);
             }
+            Camera = camera;
         }
 
         private Dictionary<int, Vector2> StepSizes = new Dictionary<int, Vector2>()
@@ -70,6 +72,7 @@ namespace LensAF
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static List<AutoFocusProfile> Profiles;
+        public static ICameraMediator Camera;
 
         public int SelectedIndex
         {

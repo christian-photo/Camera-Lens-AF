@@ -268,7 +268,7 @@ namespace LensAF
             }
         }
 
-        private void DriveFocus(IntPtr cam, FocusDirection direction)
+        public static void DriveFocus(IntPtr cam, FocusDirection direction)
         {
             if (Settings.Default.UseMixedStepSize)
             {

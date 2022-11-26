@@ -1,0 +1,190 @@
+﻿#region "copyright"
+
+/*
+    Copyright © 2022 Christian Palm (christian@palm-family.de)
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+#endregion "copyright"using System;
+
+using LensAF.Util;
+using NINA.Core.Utility;
+using NINA.Core.Utility.Notification;
+using NINA.Equipment.Interfaces;
+using NINA.Equipment.Interfaces.ViewModel;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.Composition;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace LensAF
+{
+    [Export(typeof(IEquipmentProvider))]
+    public class FocusDriverProvider : IEquipmentProvider<IFocuser>
+    {
+        public string Name => "Canon Lens Driver";
+
+        public IList<IFocuser> GetEquipment()
+        {
+            return new List<IFocuser>() { new FocusDriver("ashfojasbnfiwoet") };
+        }
+    }
+
+    public class FocusDriver : BaseINPC, IFocuser
+    {
+        private bool _isMoving = false;
+        public bool IsMoving
+        {
+            get => _isMoving;
+            set 
+            {
+                _isMoving = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private int _position = 100;
+        public int Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private bool _connected;
+        public bool Connected
+        {
+            get => _connected;
+            set
+            {
+                _connected = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private double _stepSize = 100;
+        public double StepSize
+        {
+            get => _stepSize;
+            set
+            {
+                _stepSize = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int MaxIncrement { get; set; } = 10000;
+
+        public int MaxStep { get; set; } = 10000;
+
+        public bool TempCompAvailable { get; set; } = false;
+
+        public bool TempComp { get; set; } = false;
+
+        public double Temperature { get; set; } = double.NaN;
+
+        public bool HasSetupDialog { get; set; } = false;
+
+        public string Id { get; set; }
+
+        public string Name { get; set; } = "Canon Lens Driver";
+
+        public string Category { get; set; } = "Canon";
+
+        public string Description { get; set; } = "A lens driver for canon lenses";
+
+        public string DriverInfo { get; set; } = string.Empty;
+
+        public string DriverVersion { get; set; } = "1.0.0.0";
+
+        public IList<string> SupportedActions { get; set; }
+
+
+        public FocusDriver(string id)
+        {
+            Id = id;
+        }
+
+        public string Action(string actionName, string actionParameters)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<bool> Connect(CancellationToken token)
+        {
+            return Task.Run(async () =>
+            {
+                List<string> errors = Utility.Validate(LensAF.Camera);
+                if (errors.Count > 0)
+                {
+                    foreach (string error in errors)
+                    {
+                        Notification.ShowError(error);
+                    }
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        public void Disconnect()
+        {
+            
+        }
+
+        public void Halt()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task Move(int position, CancellationToken ct, int waitInMs = 1000)
+        {
+            double diff = Position - position;
+            if (diff > 0) // Drive focus near
+            {
+                while (diff / StepSize > 0)
+                {
+                    AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Near);
+                    diff -= StepSize;
+                }
+            }
+            else // Drive focus far
+            {
+                while (diff / StepSize < 0)
+                {
+                    AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Far);
+                    diff += StepSize;
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        public void SendCommandBlind(string command, bool raw = true)
+        {
+            return;
+        }
+
+        public bool SendCommandBool(string command, bool raw = true)
+        {
+            return false;
+        }
+
+        public string SendCommandString(string command, bool raw = true)
+        {
+            return string.Empty;
+        }
+
+        public void SetupDialog()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+}

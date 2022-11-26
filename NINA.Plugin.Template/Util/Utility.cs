@@ -48,5 +48,20 @@ namespace LensAF.Util
                 return IntPtr.Zero;
             }
         }
+
+        public static List<string> Validate(ICameraMediator Camera)
+        {
+            List<string> error = new List<string>();
+            bool cameraConnected = Camera.GetInfo().Connected;
+
+            CameraVM cameraVM = (CameraVM)Utility.GetInstanceField((CameraMediator)Camera, "handler");
+
+            if (!(cameraVM.DeviceChooserVM.SelectedDevice.Category == "Canon" && cameraConnected))
+            {
+                error.Add("No Canon camera connected");
+            }
+
+            return error;
+        }
     }
 }
