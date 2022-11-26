@@ -35,8 +35,13 @@ namespace LensAF
 
         public IList<IFocuser> GetEquipment()
         {
-            CameraInfo info = new CameraInfo(Utility.GetCamera(LensAF.Camera));
-            return new List<IFocuser>() { new FocusDriver(info.LensName) { Name = $"Canon Lens Driver ({info.LensName})" } };
+            List<string> errors = Utility.Validate(LensAF.Camera);
+            if (errors.Count == 0)
+            {
+                CameraInfo info = new CameraInfo(Utility.GetCamera(LensAF.Camera));
+                return new List<IFocuser>() { new FocusDriver(info.LensName) { Name = $"Canon Lens Driver ({info.LensName})" } };
+            }
+            return new List<IFocuser>();
         }
     }
 
