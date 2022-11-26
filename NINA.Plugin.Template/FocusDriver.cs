@@ -10,12 +10,14 @@
 #endregion "copyright"using System;
 
 using Dasync.Collections;
+using EDSDKLib;
 using LensAF.Util;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -73,7 +75,7 @@ namespace LensAF
             }
         }
 
-        private double _stepSize = 5;
+        private double _stepSize = 10;
         public double StepSize
         {
             get => _stepSize;
@@ -161,24 +163,27 @@ namespace LensAF
         public async Task Move(int position, CancellationToken ct, int waitInMs = 1000)
         {
             double diff = Position - position;
+            IntPtr cam = Utility.GetCamera(LensAF.Camera);
             CancellationTokenSource token = new CancellationTokenSource();
             IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
 
-            await data.ForEachAsync(_ =>
+            await data.ForEachAsync(async _ =>
             {
                 if (diff > 0) // Drive focus near
                 {
-                    while (diff / StepSize > 0)
+                    while (diff > 0)
                     {
-                        AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Near);
+                        EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                        await Task.Delay(100);
                         diff -= StepSize;
                     }
                 }
                 else // Drive focus far
                 {
-                    while (diff / StepSize < 0)
+                    while (diff < 0)
                     {
-                        AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Far);
+                        EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                        await Task.Delay(100);
                         diff += StepSize;
                     }
                 }
