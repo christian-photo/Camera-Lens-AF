@@ -9,11 +9,13 @@
 
 #endregion "copyright"using System;
 
+using Dasync.Collections;
 using LensAF.Util;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.ViewModel;
+using NINA.Image.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
@@ -31,7 +33,8 @@ namespace LensAF
 
         public IList<IFocuser> GetEquipment()
         {
-            return new List<IFocuser>() { new FocusDriver("ashfojasbnfiwoet") };
+            CameraInfo info = new CameraInfo(Utility.GetCamera(LensAF.Camera));
+            return new List<IFocuser>() { new FocusDriver(info.LensName) { Name = $"Canon Lens Driver ({info.LensName})" } };
         }
     }
 
@@ -70,13 +73,24 @@ namespace LensAF
             }
         }
 
-        private double _stepSize = 100;
+        private double _stepSize = 5;
         public double StepSize
         {
             get => _stepSize;
             set
             {
                 _stepSize = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private string _name = "Canon Lens Driver";
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
                 RaisePropertyChanged();
             }
         }
@@ -94,8 +108,6 @@ namespace LensAF
         public bool HasSetupDialog { get; set; } = false;
 
         public string Id { get; set; }
-
-        public string Name { get; set; } = "Canon Lens Driver";
 
         public string Category { get; set; } = "Canon";
 
@@ -120,7 +132,7 @@ namespace LensAF
 
         public Task<bool> Connect(CancellationToken token)
         {
-            return Task.Run(async () =>
+            return Task.Run(() =>
             {
                 List<string> errors = Utility.Validate(LensAF.Camera);
                 if (errors.Count > 0)
@@ -129,42 +141,51 @@ namespace LensAF
                     {
                         Notification.ShowError(error);
                     }
-                    return false;
+                    return Connected;
                 }
-                return true;
+                Connected = true;
+                return Connected;
             });
         }
 
         public void Disconnect()
         {
-            
+            Connected = false;
         }
 
         public void Halt()
         {
-            throw new System.NotImplementedException();
+            return;
         }
 
-        public Task Move(int position, CancellationToken ct, int waitInMs = 1000)
+        public async Task Move(int position, CancellationToken ct, int waitInMs = 1000)
         {
             double diff = Position - position;
-            if (diff > 0) // Drive focus near
+            CancellationTokenSource token = new CancellationTokenSource();
+            IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
+
+            await data.ForEachAsync(_ =>
             {
-                while (diff / StepSize > 0)
+                if (diff > 0) // Drive focus near
                 {
-                    AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Near);
-                    diff -= StepSize;
+                    while (diff / StepSize > 0)
+                    {
+                        AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Near);
+                        diff -= StepSize;
+                    }
                 }
-            }
-            else // Drive focus far
-            {
-                while (diff / StepSize < 0)
+                else // Drive focus far
                 {
-                    AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Far);
-                    diff += StepSize;
+                    while (diff / StepSize < 0)
+                    {
+                        AutoFocus.DriveFocus(Utility.GetCamera(LensAF.Camera), FocusDirection.Far);
+                        diff += StepSize;
+                    }
                 }
-            }
-            return Task.CompletedTask;
+                Position = position;
+                token.Cancel();
+            });
+            return;
         }
 
         public void SendCommandBlind(string command, bool raw = true)
