@@ -11,7 +11,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <DataTemplate x:Key="LensAF.FocusDriver_FocuserSettings">
-        <Grid>
+        <Grid DataContext="{Binding}">
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="StepSize/Resolution" />
