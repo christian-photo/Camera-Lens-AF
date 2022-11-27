@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("1.5.6.1")]
-[assembly: AssemblyFileVersion("1.5.6.1")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -36,7 +36,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("Tags", "AF,Sequencer,Canon")]
 
 //[Optional] An in-depth description of your plugin
-[assembly: AssemblyMetadata("LongDescription", @"This Plugin provides an instruction and triggers for the Advanced to run an AF with your camera lens attached to a Canon Camera
+[assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attachted to Canon cameras
 
 ## Important Note!
 **Test the plugin before you use it in your imaging runs, because this plugin may not work for everyone! This plugin doesn't work with ASCOM.DSLR unfortuantely!**  
@@ -46,7 +46,6 @@ If you have questions/feedback/issues, you can ask on the [NINA discord](https:/
 **Requirements**:  
 - A Canon Camera,  
 - A Camera Lens that supports AF
-- The plugin only runs in the advanced sequencer and the imaging tab
 
 The plugin was tested using the following camera and lenses (Note that there are often issues with third-party lenses, so be aware of that):
 - Canon EOS 600d
@@ -60,15 +59,7 @@ The plugin was tested using the following camera and lenses (Note that there are
 
 
 Known issues:
-- Some cameras or lenses may try to refocus, when taking images if the lens is set to AF
-
-
-
-
-#Troubleshooting:
-What to try if:
-- ...the focus doesn't move: Try a different step size (2 always worked for me) or try switching your lens from AF/MF to MF/AF
-- ...the plugin didn't result in good focus: Try a different step size (2 always worked for me)")]
+- Some cameras or lenses may try to refocus, when taking images if the lens is set to AF")]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible
