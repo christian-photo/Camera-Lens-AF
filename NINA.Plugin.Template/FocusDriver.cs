@@ -80,7 +80,7 @@ namespace LensAF
             }
         }
 
-        private double _stepSize = 10;
+        private double _stepSize = 1;
         public double StepSize
         {
             get => _stepSize;
@@ -172,14 +172,14 @@ namespace LensAF
             CancellationTokenSource token = new CancellationTokenSource();
             IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
 
-            await data.ForEachAsync(async _ =>
+            await data.ForEachAsync(_ =>
             {
                 if (diff > 0) // Drive focus near
                 {
                     while (diff > 0)
                     {
                         EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
-                        await Task.Delay(100);
+                        Thread.Sleep(200);
                         diff -= StepSize;
                     }
                 }
@@ -188,7 +188,7 @@ namespace LensAF
                     while (diff < 0)
                     {
                         EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
-                        await Task.Delay(100);
+                        Thread.Sleep(200);
                         diff += StepSize;
                     }
                 }

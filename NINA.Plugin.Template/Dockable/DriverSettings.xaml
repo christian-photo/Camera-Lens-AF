@@ -1,0 +1,24 @@
+﻿<!--
+    Copyright © 2022 Christian Palm (christian@palm-family.de)
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+
+<ResourceDictionary
+    x:Class="LensAF.Dockable.DriverSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <DataTemplate x:Key="LensAF.FocusDriverProvider_FocuserSettings">
+        <Grid>
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="StepSize/Resolution" />
+                    <TextBox Width="100" Text="{Binding StepSize}" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
+</ResourceDictionary>
