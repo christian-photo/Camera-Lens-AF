@@ -7,14 +7,9 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#endregion "copyright"using System;
+#endregion "copyright"
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace LensAF.Dockable

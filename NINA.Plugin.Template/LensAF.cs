@@ -9,20 +9,13 @@
 
 #endregion "copyright"
 
-using LensAF.Dockable;
 using LensAF.Properties;
-using LensAF.Util;
-using Newtonsoft.Json;
 using NINA.Core.Utility;
-using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces.Mediator;
 using NINA.Plugin;
 using NINA.Plugin.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.Numerics;
 
 namespace LensAF
 {
@@ -40,18 +33,6 @@ namespace LensAF
             }
             Camera = camera;
         }
-
-        private Dictionary<int, Vector2> StepSizes = new Dictionary<int, Vector2>()
-        {
-            { 0, new Vector2(0, 1) },
-            { 1, new Vector2(0, 3) },
-            { 2, new Vector2(0, 5) },
-            { 3, new Vector2(1, -5) },
-            { 4, new Vector2(1, -3) },
-            { 5, new Vector2(1, 0) },
-            { 6, new Vector2(1, 3) },
-            { 7, new Vector2(1, 5) }
-        };
 
         public event PropertyChangedEventHandler PropertyChanged;
 

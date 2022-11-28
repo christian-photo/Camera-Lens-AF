@@ -115,7 +115,7 @@ namespace LensAF
 
         public string Category { get; set; } = "Canon";
 
-        public string Description { get; set; } = "A lens driver for canon lenses";
+        public string Description { get; set; } = "A lens driver for lenses attached to Canon bodies";
 
         public string DriverInfo { get; set; } = string.Empty;
 
@@ -131,7 +131,7 @@ namespace LensAF
 
         public string Action(string actionName, string actionParameters)
         {
-            throw new System.NotImplementedException();
+            return string.Empty;
         }
 
         public Task<bool> Connect(CancellationToken token)
@@ -164,6 +164,15 @@ namespace LensAF
 
         public async Task Move(int position, CancellationToken ct, int waitInMs = 1000)
         {
+            List<string> validation = Utility.Validate(LensAF.Camera);
+            if (validation.Count > 0)
+            {
+                foreach (string issue in validation)
+                {
+                    Notification.ShowError(issue);
+                    Logger.Error($"Cannot move focus: {issue}");
+                }
+            }
             double diff = Position - position;
             IntPtr cam = Utility.GetCamera(LensAF.Camera);
             CancellationTokenSource token = new CancellationTokenSource();
@@ -212,7 +221,8 @@ namespace LensAF
 
         public void SetupDialog()
         {
-            throw new System.NotImplementedException();
+            Logger.Warning("Canon lens driver SetupDialog not implemented");
+            return;
         }
     }
 }

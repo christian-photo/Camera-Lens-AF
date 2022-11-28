@@ -40,7 +40,7 @@ using System.Runtime.InteropServices;
 
 ## Important Note!
 **Test the plugin before you use it in your imaging runs, because this plugin may not work for everyone! This plugin doesn't work with ASCOM.DSLR unfortuantely!**  
-If you have questions/feedback/issues, you can ask on the [NINA discord](https://discord.com/invite/nighttime-imaging) in #plugin-discussions, take a look in the [wiki](https://github.com/rennmaus-coder/Camera-Lens-AF/wiki) or create an issue [here](https://github.com/rennmaus-coder/Camera-Lens-AF/issues)
+If you have questions/feedback/issues, you can ask on the [NINA discord](https://discord.com/invite/nighttime-imaging) in #plugin-discussions or create an issue [here](https://github.com/rennmaus-coder/Camera-Lens-AF/issues)
 
 
 **Requirements**:  
