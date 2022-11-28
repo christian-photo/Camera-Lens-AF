@@ -9,13 +9,10 @@
 
 #endregion "copyright"
 
-using EDSDKLib;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces.Mediator;
-using NINA.WPF.Base.Mediator;
-using NINA.WPF.Base.ViewModel.Equipment.Camera;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -34,13 +31,12 @@ namespace LensAF.Util
         {
             try
             {
-                CameraVM cameraVM = (CameraVM)GetInstanceField((CameraMediator)camera, "handler");
-                if (cameraVM.DeviceChooserVM.SelectedDevice.Category != "Canon")
+                if (camera.GetDevice().Category != "Canon")
                 {
                     Notification.ShowError("No canon camera connected");
                     return IntPtr.Zero;
                 }
-                return (IntPtr)GetInstanceField((EDCamera)cameraVM.DeviceChooserVM.SelectedDevice, "_cam");
+                return (IntPtr)GetInstanceField((EDCamera)((PersistSettingsCameraDecorator)camera.GetDevice()).Camera, "_cam");
             } catch (Exception e)
             {
                 Logger.Error(e);
@@ -54,9 +50,7 @@ namespace LensAF.Util
             List<string> error = new List<string>();
             bool cameraConnected = Camera.GetInfo().Connected;
 
-            CameraVM cameraVM = (CameraVM)Utility.GetInstanceField((CameraMediator)Camera, "handler");
-
-            if (!(cameraVM.DeviceChooserVM.SelectedDevice.Category == "Canon" && cameraConnected))
+            if (!(Camera.GetDevice().Category == "Canon" && cameraConnected))
             {
                 error.Add("No Canon camera connected");
             }
