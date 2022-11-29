@@ -11,6 +11,7 @@
 
 using Dasync.Collections;
 using EDSDKLib;
+using LensAF.Properties;
 using LensAF.Util;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
@@ -84,6 +85,8 @@ namespace LensAF
             set
             {
                 _stepSize = value;
+                Settings.Default.Resolution = value;
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }
         }

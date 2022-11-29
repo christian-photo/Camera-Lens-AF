@@ -50,6 +50,12 @@ namespace LensAF.Util
             List<string> error = new List<string>();
             bool cameraConnected = Camera.GetInfo().Connected;
 
+            if (!cameraConnected)
+            {
+                error.Add("No camera connected");
+                return error;
+            }
+
             if (!(Camera.GetDevice().Category == "Canon" && cameraConnected))
             {
                 error.Add("No Canon camera connected");
