@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using CommunityToolkit.Mvvm.Input;
 using Dasync.Collections;
 using EDSDKLib;
 using LensAF.Properties;
@@ -19,9 +20,7 @@ using NINA.Equipment.Interfaces.Mediator;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
 using NINA.Profile.Interfaces;
-using NINA.WPF.Base.Mediator;
 using NINA.WPF.Base.ViewModel;
-using NINA.WPF.Base.ViewModel.Equipment.Camera;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -29,6 +28,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF.Dockable
 {
@@ -41,7 +41,7 @@ namespace LensAF.Dockable
 
         public static FocusControlVM Instance;
 
-        public AsyncCommand<bool> StartFocusControl { get; set; }
+        public AsyncRelayCommand StartFocusControl { get; set; }
         public RelayCommand StopFocusControl { get; set; }
         public RelayCommand MoveLeft { get; set; }
         public RelayCommand MoveLeftBig { get; set; }
@@ -84,7 +84,7 @@ namespace LensAF.Dockable
             ImageGeometry.Freeze();
 
 
-            StartFocusControl = new AsyncCommand<bool>(async _ =>
+            StartFocusControl = new AsyncRelayCommand(async _ =>
             {
                 List<string> Issues = Utility.Validate(cam);
                 if (Issues.Count > 0)
@@ -94,7 +94,7 @@ namespace LensAF.Dockable
                         Notification.ShowError($"Can't start Focus Control: {issue}");
                         Logger.Error($"Can't start Focus Control: {issue}");
                     }
-                    return false;
+                    return;
                 }
                 FocusControlToken = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> LiveView = Camera.LiveView(FocusControlToken.Token);
@@ -113,36 +113,34 @@ namespace LensAF.Dockable
                     {
                         Image = data.RenderBitmapSource();
                     }
-                    
                 });
-                return true;
             });
 
-            StopFocusControl = new RelayCommand(_ =>
+            StopFocusControl = new RelayCommand(() =>
             {
                 if (ManualFocusControl)
                 {
-                    FocusControlToken.Cancel();
+                    FocusControlToken?.Cancel();
                     ManualFocusControl = false;
                 }
             });
 
-            MoveRight = new RelayCommand(_ =>
+            MoveRight = new RelayCommand(() =>
             {
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
             });
 
-            MoveRightBig = new RelayCommand(_ => 
+            MoveRightBig = new RelayCommand(() => 
             {
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far2);
             });
 
-            MoveLeft = new RelayCommand(_ =>
+            MoveLeft = new RelayCommand(() =>
             {
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
             });
 
-            MoveLeftBig = new RelayCommand(_ =>
+            MoveLeftBig = new RelayCommand(() =>
             {
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
             });
