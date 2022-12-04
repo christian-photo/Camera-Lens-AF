@@ -61,7 +61,7 @@ The plugin was tested using the following camera and lenses (Note that there are
 
 
 Known issues:
-- Some cameras or lenses may try to refocus, when taking images if the lens is set to AF")]
+- Some lenses may try to refocus, when taking images if the lens is set to AF")]
 
 
 // Setting ComVisible to false makes the types in this assembly not visible

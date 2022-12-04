@@ -31,9 +31,13 @@ namespace LensAF.Util
         {
             try
             {
-                if (camera.GetDevice().Category != "Canon")
+                List<string> errors = Validate(camera);
+                if (errors.Count > 0)
                 {
-                    Notification.ShowError("No canon camera connected");
+                    foreach (string error in errors)
+                    {
+                        Notification.ShowError(error);
+                    }
                     return IntPtr.Zero;
                 }
                 return (IntPtr)GetInstanceField((EDCamera)((PersistSettingsCameraDecorator)camera.GetDevice()).Camera, "_cam");
