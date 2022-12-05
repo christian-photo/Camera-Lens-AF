@@ -9,7 +9,6 @@
 
 #endregion "copyright"
 
-using CommunityToolkit.Mvvm.Input;
 using Dasync.Collections;
 using EDSDKLib;
 using LensAF.Properties;
@@ -93,7 +92,7 @@ namespace LensAF.Dockable
                         Notification.ShowError($"Can't start Focus Control: {issue}");
                         Logger.Error($"Can't start Focus Control: {issue}");
                     }
-                    return;
+                    return false;
                 }
                 FocusControlToken = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> LiveView = Camera.LiveView(FocusControlToken.Token);
@@ -113,6 +112,7 @@ namespace LensAF.Dockable
                         Image = data.RenderBitmapSource();
                     }
                 });
+                return true;
             });
 
             StopFocusControl = new RelayCommand(_ =>
