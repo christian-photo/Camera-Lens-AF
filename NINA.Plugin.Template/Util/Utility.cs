@@ -35,9 +35,14 @@ namespace LensAF.Util
             try
             {
                 CameraVM cameraVM = (CameraVM)GetInstanceField((CameraMediator)camera, "handler");
-                if (cameraVM.DeviceChooserVM.SelectedDevice.Category != "Canon")
+
+                List<string> errors = Validate(camera);
+                if (errors.Count > 0)
                 {
-                    Notification.ShowError("No canon camera connected");
+                    foreach (string error in errors)
+                    {
+                        Notification.ShowError(error);
+                    }
                     return IntPtr.Zero;
                 }
                 return (IntPtr)GetInstanceField((EDCamera)cameraVM.DeviceChooserVM.SelectedDevice, "_cam");
@@ -47,6 +52,27 @@ namespace LensAF.Util
                 Notification.ShowError(e.Message);
                 return IntPtr.Zero;
             }
+        }
+
+        public static List<string> Validate(ICameraMediator Camera)
+        {
+            List<string> error = new List<string>();
+            bool cameraConnected = Camera.GetInfo().Connected;
+
+            if (!cameraConnected)
+            {
+                error.Add("No camera connected");
+                return error;
+            }
+
+            CameraVM cameraVM = (CameraVM)GetInstanceField((CameraMediator)Camera, "handler");
+
+            if (!(cameraVM.Cam.Category == "Canon" && cameraConnected))
+            {
+                error.Add("No Canon camera connected");
+            }
+
+            return error;
         }
     }
 }

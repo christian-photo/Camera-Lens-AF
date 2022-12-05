@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using CommunityToolkit.Mvvm.Input;
 using Dasync.Collections;
 using EDSDKLib;
 using LensAF.Properties;
@@ -19,9 +20,7 @@ using NINA.Equipment.Interfaces.Mediator;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
 using NINA.Profile.Interfaces;
-using NINA.WPF.Base.Mediator;
 using NINA.WPF.Base.ViewModel;
-using NINA.WPF.Base.ViewModel.Equipment.Camera;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -35,7 +34,6 @@ namespace LensAF.Dockable
     [Export(typeof(IDockableVM))]
     public class FocusControlVM : DockableVM
     {
-        private List<string> Issues;
         private ICameraMediator Camera;
         private bool _manualFocusControl = false;
         private CancellationTokenSource FocusControlToken;
@@ -84,25 +82,25 @@ namespace LensAF.Dockable
             ImageGeometry = (GeometryGroup)dict["PluginSVG"];
             ImageGeometry.Freeze();
 
-            Issues = new List<string>();
 
             StartFocusControl = new AsyncCommand<bool>(async _ =>
             {
-                if (!Validate())
+                List<string> Issues = Utility.Validate(cam);
+                if (Issues.Count > 0)
                 {
                     foreach (string issue in Issues)
                     {
                         Notification.ShowError($"Can't start Focus Control: {issue}");
                         Logger.Error($"Can't start Focus Control: {issue}");
                     }
-                    return false;
+                    return;
                 }
                 FocusControlToken = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> LiveView = Camera.LiveView(FocusControlToken.Token);
                 ManualFocusControl = true;
 
 
-                await LiveView.ForEachAsync(async exposure => 
+                await LiveView.ForEachAsync(async exposure =>
                 {
                     IImageData data = await exposure.ToImageData();
                     if (Settings.Default.PrepareImage)
@@ -114,16 +112,14 @@ namespace LensAF.Dockable
                     {
                         Image = data.RenderBitmapSource();
                     }
-                    
                 });
-                return true;
             });
 
             StopFocusControl = new RelayCommand(_ =>
             {
                 if (ManualFocusControl)
                 {
-                    FocusControlToken.Cancel();
+                    FocusControlToken?.Cancel();
                     ManualFocusControl = false;
                 }
             });
@@ -133,7 +129,7 @@ namespace LensAF.Dockable
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
             });
 
-            MoveRightBig = new RelayCommand(_ => 
+            MoveRightBig = new RelayCommand(_ =>
             {
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far2);
             });
@@ -147,31 +143,6 @@ namespace LensAF.Dockable
             {
                 EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
             });
-        }
-
-        private bool Validate()
-        {
-            Issues.Clear();
-            bool cameraConnected = Camera.GetInfo().Connected;
-
-            if (!cameraConnected)
-            {
-                Issues.Add("Camera not connected");
-            }
-
-            if (LensAFVM.Instance.AutoFocusIsRunning)
-            {
-                Issues.Add("Can't enable focus control when AF is running");
-            }
-
-            CameraVM cameraVM = (CameraVM)Utility.GetInstanceField((CameraMediator)Camera, "handler");
-
-            if (cameraVM.DeviceChooserVM.SelectedDevice.Category != "Canon")
-            {
-                Issues.Add("No canon camera connected");
-            }
-
-            return !(Issues.Count > 0);
         }
     }
 }

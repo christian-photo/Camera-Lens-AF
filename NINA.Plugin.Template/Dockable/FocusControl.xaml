@@ -27,12 +27,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
-            <!--<Image
-                Grid.Row="0"
-                Margin="10"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Source="{Binding Image}" />-->
+
             <local:ZoomBorder Grid.Row="0" ClipToBounds="True">
                 <Image Source="{Binding Image}" />
             </local:ZoomBorder>
