@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF
 {
@@ -126,10 +127,30 @@ namespace LensAF
 
         public IList<string> SupportedActions { get; set; }
 
+        internal static FocusDriver Instance;
+        public RelayCommand CalibrateLens { get; set; }
 
         public FocusDriver(string id)
         {
             Id = id;
+            Instance = this;
+
+            CalibrateLens = new RelayCommand(async () =>
+            {
+                IntPtr cam = Utility.GetCamera(LensAF.Camera);
+                CancellationTokenSource token = new CancellationTokenSource();
+                IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
+                await data.ForEachAsync(_ =>
+                {
+                    for (int i = 0; i < 15; i++)
+                    {
+                        EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
+                        Thread.Sleep(200);
+                    }
+                    token.Cancel();
+                });
+                Position = 0;
+            });
         }
 
         public string Action(string actionName, string actionParameters)
@@ -150,6 +171,7 @@ namespace LensAF
                     }
                     return Connected;
                 }
+
                 Connected = true;
                 return Connected;
             });
