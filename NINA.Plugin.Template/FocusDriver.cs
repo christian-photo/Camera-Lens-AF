@@ -127,16 +127,23 @@ namespace LensAF
 
         public IList<string> SupportedActions { get; set; }
 
-        internal static FocusDriver Instance;
         public RelayCommand CalibrateLens { get; set; }
 
         public FocusDriver(string id)
         {
             Id = id;
-            Instance = this;
 
             CalibrateLens = new RelayCommand(async () =>
             {
+                List<string> errors = Utility.Validate(LensAF.Camera);
+                if (errors.Count > 0)
+                {
+                    foreach (string error in errors)
+                    {
+                        Notification.ShowError(error);
+                    }
+                    return;
+                }
                 IntPtr cam = Utility.GetCamera(LensAF.Camera);
                 CancellationTokenSource token = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
@@ -149,7 +156,7 @@ namespace LensAF
                     }
                     token.Cancel();
                 });
-                Position = 0;
+                Position = 100;
             });
         }
 

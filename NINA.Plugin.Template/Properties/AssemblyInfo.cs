@@ -54,7 +54,7 @@ The plugin was tested using the following camera and lenses (Note that there are
 - Canon EF 100-400 f/4.5-5.6 L IS USM
 - Canon EF 24-105 f/4 L IS USM
 
-## Manual Focus Control controls
+## Manual Focus Control controls (The Manual Focus Control does not affect the focuser position!)
 - Mousewheel/Trackpad: Zoom in/out
 - Left mousebutton: Pan around
 - Right mousebutton: reset
