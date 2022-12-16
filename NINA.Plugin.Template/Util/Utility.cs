@@ -14,8 +14,6 @@ using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces.Mediator;
-using NINA.WPF.Base.Mediator;
-using NINA.WPF.Base.ViewModel.Equipment.Camera;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -34,8 +32,6 @@ namespace LensAF.Util
         {
             try
             {
-                CameraVM cameraVM = (CameraVM)GetInstanceField((CameraMediator)camera, "handler");
-
                 List<string> errors = Validate(camera);
                 if (errors.Count > 0)
                 {
@@ -45,8 +41,9 @@ namespace LensAF.Util
                     }
                     return IntPtr.Zero;
                 }
-                return (IntPtr)GetInstanceField((EDCamera)cameraVM.DeviceChooserVM.SelectedDevice, "_cam");
-            } catch (Exception e)
+                return (IntPtr)GetInstanceField((EDCamera)((PersistSettingsCameraDecorator)camera.GetDevice()).Camera, "_cam");
+            }
+            catch (Exception e)
             {
                 Logger.Error(e);
                 Notification.ShowError(e.Message);
@@ -65,9 +62,7 @@ namespace LensAF.Util
                 return error;
             }
 
-            CameraVM cameraVM = (CameraVM)GetInstanceField((CameraMediator)Camera, "handler");
-
-            if (!(cameraVM.Cam.Category == "Canon" && cameraConnected))
+            if (!(Camera.GetDevice().Category == "Canon" && cameraConnected))
             {
                 error.Add("No Canon camera connected");
             }
