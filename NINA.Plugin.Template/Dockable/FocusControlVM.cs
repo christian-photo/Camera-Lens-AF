@@ -127,22 +127,30 @@ namespace LensAF.Dockable
 
             MoveRight = new RelayCommand(() =>
             {
-                EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                if (error != EDSDK.EDS_ERR_OK)
+                    Logger.Debug(Utility.ErrorCodeToString(error));
             });
 
-            MoveRightBig = new RelayCommand(() => 
+            MoveRightBig = new RelayCommand(() =>
             {
-                EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far2);
+                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far2);
+                if (error != EDSDK.EDS_ERR_OK)
+                    Logger.Debug(Utility.ErrorCodeToString(error));
             });
 
             MoveLeft = new RelayCommand(() =>
             {
-                EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                if (error != EDSDK.EDS_ERR_OK)
+                    Logger.Debug(Utility.ErrorCodeToString(error));
             });
 
             MoveLeftBig = new RelayCommand(() =>
             {
-                EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
+                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
+                if (error != EDSDK.EDS_ERR_OK)
+                    Logger.Debug(Utility.ErrorCodeToString(error));
             });
         }
     }

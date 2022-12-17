@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using EDSDKLib;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
@@ -66,6 +67,21 @@ namespace LensAF.Util
             }
 
             return error;
+        }
+
+        public static string ErrorCodeToString(uint error)
+        {
+            string errStr;
+            if (EDSDKLocal.ErrorCodes.ContainsKey(error))
+            {
+                errStr = EDSDKLocal.ErrorCodes[error];
+            }
+            else
+            {
+                errStr = $"Unknown ({error})";
+            }
+
+            return errStr;
         }
     }
 }
