@@ -150,7 +150,9 @@ namespace LensAF
                 {
                     for (int i = 0; i < 15; i++)
                     {
-                        EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
+                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
+                        if (error != EDSDK.EDS_ERR_OK)
+                            Logger.Debug(Utility.ErrorCodeToString(error));
                         Thread.Sleep(200);
                     }
                     token.Cancel();
@@ -215,7 +217,10 @@ namespace LensAF
                 {
                     while (diff > 0)
                     {
-                        EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                        if (error != EDSDK.EDS_ERR_OK)
+                            Logger.Debug(Utility.ErrorCodeToString(error));
+
                         Thread.Sleep(200);
                         diff -= StepSize;
                     }
@@ -224,7 +229,10 @@ namespace LensAF
                 {
                     while (diff < 0)
                     {
-                        EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                        if (error != EDSDK.EDS_ERR_OK)
+                            Logger.Debug(Utility.ErrorCodeToString(error));
+
                         Thread.Sleep(200);
                         diff += StepSize;
                     }

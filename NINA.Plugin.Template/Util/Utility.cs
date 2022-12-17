@@ -69,5 +69,20 @@ namespace LensAF.Util
 
             return error;
         }
+
+        public static string ErrorCodeToString(uint error)
+        {
+            string errStr;
+            if (EDSDKLocal.ErrorCodes.ContainsKey(error))
+            {
+                errStr = EDSDKLocal.ErrorCodes[error];
+            }
+            else
+            {
+                errStr = $"Unknown ({error})";
+            }
+
+            return errStr;
+        }
     }
 }
