@@ -159,6 +159,7 @@ namespace LensAF
                     token.Cancel();
                 });
                 Position = 100;
+                Notification.ShowSuccess("Calibration finished");
             });
         }
 
