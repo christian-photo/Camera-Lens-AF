@@ -11,6 +11,7 @@
 
 using LensAF.Properties;
 using NINA.Core.Utility;
+using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces.Mediator;
 using NINA.Plugin;
 using NINA.Plugin.Interfaces;
@@ -30,6 +31,11 @@ namespace LensAF
                 Settings.Default.Upgrade();
                 Settings.Default.UpdateSettings = false;
                 CoreUtil.SaveSettings(Settings.Default);
+            }
+            if (Settings.Default.IsFirstLaunch)
+            {
+                Notification.ShowWarning("LensAF: This new version (2.1.0.0) is incompatible with the previous versions (1.x). Replace the LensAF instructions with NINA AF instructions!");
+                Settings.Default.IsFirstLaunch = false;
             }
             Camera = camera;
         }
