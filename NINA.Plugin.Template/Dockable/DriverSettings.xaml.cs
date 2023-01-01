@@ -12,12 +12,12 @@
 using System.ComponentModel.Composition;
 using System.Windows;
 
-namespace LensAF.Items {
-
+namespace LensAF.Dockable
+{
     [Export(typeof(ResourceDictionary))]
-    public partial class View : ResourceDictionary {
-
-        public View() 
+    partial class DriverSettings : ResourceDictionary
+    {
+        public DriverSettings()
         {
             InitializeComponent();
         }

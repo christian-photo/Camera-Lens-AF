@@ -18,65 +18,8 @@
     <DataTemplate x:Key="Lens AF_Options">
         <StackPanel DataContext="{Binding}" Orientation="Vertical">
 
-            <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Width="200" Text="Autofocus method" />
-                <ComboBox
-                    Width="200"
-                    Height="24"
-                    HorizontalContentAlignment="Center"
-                    SelectedIndex="{Binding AutoFocusLogic, Mode=TwoWay}">
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Star HFR (recommended)" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Contrast (experimental)" />
-                </ComboBox>
-            </StackPanel>
-
-            <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Width="200" Text="Auto focus Step Size" />
-                <ComboBox Width="150" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 1" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 2" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 3" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 4" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 5" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 6" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 7" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Step Size 8" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Profile 1" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="Profile 2" />
-                </ComboBox>
-            </StackPanel>
-
-            <StackPanel Margin="10,10,10,20" Orientation="Horizontal">
-                <TextBlock
-                    Width="200"
-                    Margin="0,2,0,0"
-                    Text="Use mixed step size" />
-                <CheckBox IsChecked="{Binding UseMixedStepSize}" IsEnabled="{Binding ButtonEnabled}" />
-                <TextBlock Margin="0,2,0,0" Text="  Big Steps:" />
-                <ninactrl:UnitTextBox
-                    Width="50"
-                    Margin="5,0,0,5"
-                    Text="{Binding StepSizeBig}" />
-                <ComboBox
-                    Width="Auto"
-                    Height="22"
-                    Margin="10,0,10,5"
-                    SelectedIndex="{Binding StepSizeLogic, Mode=TwoWay}">
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="+" />
-                    <ComboBoxItem HorizontalAlignment="Stretch" Content="-" />
-                </ComboBox>
-                <TextBlock Margin="0,2,0,0" Text="  Small Steps:" />
-                <ninactrl:UnitTextBox
-                    Width="50"
-                    Margin="5,0,0,5"
-                    Text="{Binding StepSizeSmall}" />
-            </StackPanel>
-
             <StackPanel Margin="10,5,5,10" Orientation="Horizontal">
-                <TextBlock
-                    Width="200"
-                    Margin="0,2,0,0"
-                    Text="Prepare Liveview" />
+                <TextBlock Margin="0,2,0,0" Text="Prepare Liveview" />
                 <CheckBox IsChecked="{Binding PrepareImage}" />
                 <TextBlock Margin="0,2,0,0" Text="  Stretch factor:" />
                 <TextBox
@@ -92,32 +35,6 @@
                     Text="{Binding Blackclipping}" />
             </StackPanel>
 
-
-            <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Width="200" Text="Exposure Time" />
-                <ninactrl:UnitTextBox
-                    Width="150"
-                    Text="{Binding ExposureTime, Mode=TwoWay}"
-                    Unit="s" />
-            </StackPanel>
-            <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Width="200" Text="Initial Offset" />
-                <ninactrl:UnitTextBox
-                    Width="150"
-                    Text="{Binding InitialOffset}"
-                    Unit="steps" />
-            </StackPanel>
-            <StackPanel Margin="10" Orientation="Horizontal">
-                <TextBlock Width="200" Text="Iterations" />
-                <TextBox Width="150" Text="{Binding Iterations}" />
-            </StackPanel>
-            <Button
-                Width="200"
-                Height="30"
-                Margin="10"
-                HorizontalAlignment="Left"
-                Command="{Binding ResetAF}"
-                Content="Reset Auto focus is running" />
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>

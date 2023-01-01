@@ -14,8 +14,6 @@ using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces.Mediator;
-using NINA.WPF.Base.Mediator;
-using NINA.WPF.Base.ViewModel.Equipment.Camera;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -34,19 +32,57 @@ namespace LensAF.Util
         {
             try
             {
-                CameraVM cameraVM = (CameraVM)GetInstanceField((CameraMediator)camera, "handler");
-                if (cameraVM.DeviceChooserVM.SelectedDevice.Category != "Canon")
+                List<string> errors = Validate(camera);
+                if (errors.Count > 0)
                 {
-                    Notification.ShowError("No canon camera connected");
+                    foreach (string error in errors)
+                    {
+                        Notification.ShowError(error);
+                    }
                     return IntPtr.Zero;
                 }
-                return (IntPtr)GetInstanceField((EDCamera)cameraVM.DeviceChooserVM.SelectedDevice, "_cam");
-            } catch (Exception e)
+                return (IntPtr)GetInstanceField((EDCamera)((PersistSettingsCameraDecorator)camera.GetDevice()).Camera, "_cam");
+            }
+            catch (Exception e)
             {
                 Logger.Error(e);
                 Notification.ShowError(e.Message);
                 return IntPtr.Zero;
             }
+        }
+
+        public static List<string> Validate(ICameraMediator Camera)
+        {
+            List<string> error = new List<string>();
+            bool cameraConnected = Camera.GetInfo().Connected;
+
+            if (!cameraConnected)
+            {
+                error.Add("No camera connected");
+                return error;
+            }
+
+            if (!(Camera.GetDevice().Category == "Canon" && cameraConnected))
+            {
+                error.Add("No Canon camera connected");
+            }
+
+            return error;
+        }
+
+        public static string ErrorCodeToString(uint error)
+        {
+            string errStr;
+            if (EDSDKLocal.ErrorCodes.ContainsKey(error))
+            {
+                errStr = EDSDKLocal.ErrorCodes[error];
+            }
+            else
+            {
+                errStr = $"Unknown ({error})";
+            }
+
+            return errStr;
         }
     }
 }
