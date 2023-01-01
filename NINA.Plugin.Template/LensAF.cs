@@ -36,6 +36,7 @@ namespace LensAF
             {
                 Notification.ShowWarning("LensAF: This new version (2.1.0.0) is incompatible with the previous versions (1.x). Replace the LensAF instructions with NINA AF instructions!");
                 Settings.Default.IsFirstLaunch = false;
+                CoreUtil.SaveSettings(Settings.Default);
             }
             Camera = camera;
         }
