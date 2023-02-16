@@ -56,13 +56,24 @@ namespace LensAF
             }
         }
 
-        private int _position = 100;
+        private int _position = 200;
         public int Position
         {
             get => _position;
             set
             {
                 _position = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private int _focusStopPosition = 200;
+        public int FocusStopPosition
+        {
+            get => _focusStopPosition;
+            set
+            {
+                _focusStopPosition = value;
                 RaisePropertyChanged();
             }
         }
@@ -157,7 +168,10 @@ namespace LensAF
                     }
                     token.Cancel();
                 });
-                Position = 100;
+                int position = Position;
+                Position = FocusStopPosition;
+                CancellationToken ct = new CancellationToken();
+                await Move(position, ct, 1000);
                 Notification.ShowSuccess("Calibration finished");
             });
         }
