@@ -294,6 +294,7 @@
     <Compile Include="Dockable\FocusControlVM.cs" />
     <Compile Include="FocusDriver.cs" />
     <Compile Include="LensAF.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="Util\CameraInfo.cs" />
     <Compile Include="Util\Utility.cs" />
     <Compile Include="Options.xaml.cs">

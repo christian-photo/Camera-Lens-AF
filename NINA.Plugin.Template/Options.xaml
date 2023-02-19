@@ -19,20 +19,29 @@
         <StackPanel DataContext="{Binding}" Orientation="Vertical">
 
             <StackPanel Margin="10,5,5,10" Orientation="Horizontal">
-                <TextBlock Margin="0,2,0,0" Text="Prepare Liveview" />
+                <TextBlock Margin="0,2,2,0" Text="Prepare Liveview" />
                 <CheckBox IsChecked="{Binding PrepareImage}" />
-                <TextBlock Margin="0,2,0,0" Text="  Stretch factor:" />
+                <TextBlock Margin="10,2,0,0" Text="  Stretch factor:" />
                 <TextBox
                     Width="50"
                     Margin="5,0,0,5"
                     IsEnabled="{Binding PrepareImage}"
                     Text="{Binding Stretchfactor}" />
-                <TextBlock Margin="0,2,0,0" Text="  Black clipping:" />
+                <TextBlock Margin="10,2,0,0" Text="  Black clipping:" />
                 <TextBox
                     Width="50"
                     Margin="5,0,0,5"
                     IsEnabled="{Binding PrepareImage}"
                     Text="{Binding Blackclipping}" />
+                <TextBlock
+                    Margin="10,2,0,0"
+                    Text="  Focus Stop Position:"
+                    ToolTip="Fine tune for your Camera/Lens combination" />
+                <TextBox
+                    Width="50"
+                    Margin="5,0,0,5"
+                    Text="{Binding FocusStopPosition, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTip="The Lens is moved to the Focus Stop, Position is set to this value, the Lens is moved to the Target position" />
             </StackPanel>
 
         </StackPanel>

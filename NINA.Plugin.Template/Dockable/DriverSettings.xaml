@@ -33,20 +33,6 @@
                     Content="Calibrate Lens"
                     ToolTip="Recommended to click before every imaging session, resets focus position" />
 
-                <StackPanel Margin="0,40,0,0" Orientation="Horizontal">
-                    <TextBlock
-                        Width="115"
-                        Margin="0,5,10,0"
-                        Text="Focus Stop Position"
-                        ToolTip="Fine tune for your Camera/Lens combination" />
-                    <TextBox
-                        Width="100"
-                        Height="25"
-                        Margin="0,2,0,0"
-                        HorizontalAlignment="Left"
-                        Text="{Binding FocusStopPosition, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTip="The Lens is moved to the Focus Stop, Position is set to this value, the Lens is moved to the Target position" />
-                </StackPanel>
             </StackPanel>
         </Grid>
     </DataTemplate>

@@ -20,6 +20,7 @@ using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,17 +64,6 @@ namespace LensAF
             set
             {
                 _position = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        private int _focusStopPosition = 200;
-        public int FocusStopPosition
-        {
-            get => _focusStopPosition;
-            set
-            {
-                _focusStopPosition = value;
                 RaisePropertyChanged();
             }
         }
@@ -157,6 +147,7 @@ namespace LensAF
                 IntPtr cam = Utility.GetCamera(LensAF.Camera);
                 CancellationTokenSource token = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
+                IsMoving = true;
                 await data.ForEachAsync(_2 =>
                 {
                     for (int i = 0; i < 15; i++)
@@ -168,10 +159,13 @@ namespace LensAF
                     }
                     token.Cancel();
                 });
+                IsMoving = false;
                 int position = Position;
-                Position = FocusStopPosition;
+                Position = Settings.Default.FocusStopPosition;
                 CancellationToken ct = new CancellationToken();
+                IsMoving = true;
                 await Move(position, ct, 1000);
+                IsMoving = false;
                 Notification.ShowSuccess("Calibration finished");
             });
         }

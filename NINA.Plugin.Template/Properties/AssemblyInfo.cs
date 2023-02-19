@@ -36,7 +36,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("Tags", "AF,Sequencer,Canon")]
 
 //[Optional] An in-depth description of your plugin
-[assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attachted to Canon cameras
+[assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attached to Canon cameras
 
 To be able to use the driver, a Canon camera has to be connected
 
