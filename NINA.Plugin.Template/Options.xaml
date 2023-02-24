@@ -36,12 +36,16 @@
                 <TextBlock
                     Margin="10,2,0,0"
                     Text="  Focus Stop Position:"
-                    ToolTip="Fine tune for your Camera/Lens combination" />
-                <TextBox
+                    ToolTip="Fine tune for your Camera/Lens combination.
+&#x0d;&#x0a;It may take a few iterations to find the best value, but after that it shouldn't change." />
+                <TextBox xml:space="preserve"
                     Width="50"
                     Margin="5,0,0,5"
                     Text="{Binding FocusStopPosition, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip="The Lens is moved to the Focus Stop, Position is set to this value, the Lens is moved to the Target position" />
+                    ToolTip="The Lens is moved to the Focus Stop,
+&#x0d;&#x0a;Position is set to this value,
+&#x0d;&#x0a;the Lens is moved to the Target position.
+&#x0d;&#x0a;The final position should be near enough to the optimal focus so that AutoFocus can be successful." />
             </StackPanel>
 
         </StackPanel>
