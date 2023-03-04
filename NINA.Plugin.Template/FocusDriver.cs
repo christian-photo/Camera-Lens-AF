@@ -57,7 +57,7 @@ namespace LensAF
             }
         }
 
-        private int _position = 200;
+        private int _position = Settings.Default.FocusStopPosition;
         public int Position
         {
             get => _position;
