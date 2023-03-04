@@ -86,5 +86,19 @@ namespace LensAF
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Blackclipping)));
             }
         }
+
+        public int FocusStopPosition
+        {
+            get
+            {
+                return Settings.Default.FocusStopPosition;
+            }
+            set
+            {
+                Settings.Default.FocusStopPosition = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FocusStopPosition)));
+            }
+        }
     }
 }

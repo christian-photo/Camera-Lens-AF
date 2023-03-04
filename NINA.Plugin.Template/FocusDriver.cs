@@ -57,7 +57,7 @@ namespace LensAF
             }
         }
 
-        private int _position = 100;
+        private int _position = Settings.Default.FocusStopPosition;
         public int Position
         {
             get => _position;
@@ -147,6 +147,7 @@ namespace LensAF
                 IntPtr cam = Utility.GetCamera(LensAF.Camera);
                 CancellationTokenSource token = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
+                IsMoving = true;
                 await data.ForEachAsync(_ =>
                 {
                     for (int i = 0; i < 15; i++)
@@ -158,7 +159,13 @@ namespace LensAF
                     }
                     token.Cancel();
                 });
-                Position = 100;
+                IsMoving = false;
+                int position = Position;
+                Position = Settings.Default.FocusStopPosition;
+                CancellationToken ct = new CancellationToken();
+                IsMoving = true;
+                await Move(position, ct, 1000);
+                IsMoving = false;
                 Notification.ShowSuccess("Calibration finished");
             });
         }
