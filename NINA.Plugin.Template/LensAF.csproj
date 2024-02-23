@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <OutputType>Library</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
@@ -43,14 +43,15 @@
   <ItemGroup>
     <PackageReference Include="Dirkster.AvalonDock" Version="4.60.0" />
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" />
-    <PackageReference Include="NINA.Core" Version="3.0.0.1001-nightly2" />
-    <PackageReference Include="NINA.Equipment" Version="3.0.0.1001-nightly2" />
-    <PackageReference Include="NINA.Image" Version="3.0.0.1001-nightly2" />
+    <PackageReference Include="NINA.Core" Version="3.0.0.2017-beta" />
+    <PackageReference Include="NINA.CustomControlLibrary" Version="3.0.0.2017-beta" />
+    <PackageReference Include="NINA.Equipment" Version="3.0.0.2017-beta" />
+    <PackageReference Include="NINA.Image" Version="3.0.0.2017-beta" />
     <PackageReference Include="NINA.OxyPlot.Contrib.Wpf" Version="3.0.0.1001-preview3" />
-    <PackageReference Include="NINA.Plugin" Version="3.0.0.1001-nightly2" />
-    <PackageReference Include="NINA.Profile" Version="3.0.0.1001-nightly2" />
-    <PackageReference Include="NINA.Sequencer" Version="3.0.0.1001-nightly2" />
-    <PackageReference Include="NINA.WPF.Base" Version="3.0.0.1001-nightly2" />
+    <PackageReference Include="NINA.Plugin" Version="3.0.0.2017-beta" />
+    <PackageReference Include="NINA.Profile" Version="3.0.0.2017-beta" />
+    <PackageReference Include="NINA.Sequencer" Version="3.0.0.2017-beta" />
+    <PackageReference Include="NINA.WPF.Base" Version="3.0.0.2017-beta" />
     <PackageReference Include="NINACustomControlLibrary" Version="2.0.3.2005" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />

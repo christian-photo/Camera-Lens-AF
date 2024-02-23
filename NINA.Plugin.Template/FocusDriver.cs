@@ -129,6 +129,8 @@ namespace LensAF
 
         public RelayCommand CalibrateLens { get; set; }
 
+        public string DisplayName { get; set; } = "Canon Lens Driver";
+
         public FocusDriver(string id)
         {
             Id = id;
