@@ -1,7 +1,7 @@
 ﻿#region "copyright"
 
 /*
-    Copyright © 2022 Christian Palm (christian@palm-family.de)
+    Copyright © 2025 Christian Palm (christian@palm-family.de)
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -11,7 +11,6 @@
 
 using LensAF.Properties;
 using NINA.Core.Utility;
-using NINA.Core.Utility.Notification;
 using NINA.Equipment.Interfaces.Mediator;
 using NINA.Plugin;
 using NINA.Plugin.Interfaces;
@@ -30,12 +29,6 @@ namespace LensAF
             {
                 Settings.Default.Upgrade();
                 Settings.Default.UpdateSettings = false;
-                CoreUtil.SaveSettings(Settings.Default);
-            }
-            if (Settings.Default.IsFirstLaunch)
-            {
-                Notification.ShowWarning("LensAF: This new version (2.1.0.0) is incompatible with the previous versions (1.x). Replace the LensAF instructions with NINA AF instructions!");
-                Settings.Default.IsFirstLaunch = false;
                 CoreUtil.SaveSettings(Settings.Default);
             }
             Camera = camera;

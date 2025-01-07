@@ -1,7 +1,7 @@
 ﻿#region "copyright"
 
 /*
-    Copyright © 2022 Christian Palm (christian@palm-family.de)
+    Copyright © 2025 Christian Palm (christian@palm-family.de)
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -13,6 +13,7 @@ using EDSDKLib;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
+using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.Mediator;
 using System;
 using System.Collections.Generic;
@@ -41,8 +42,10 @@ namespace LensAF.Util
                     }
                     return IntPtr.Zero;
                 }
-                return (IntPtr)GetInstanceField((EDCamera)((PersistSettingsCameraDecorator)camera.GetDevice()).Camera, "_cam");
-            } catch (Exception e)
+                IDevice cam = camera.GetDevice() is PersistSettingsCameraDecorator decorator ? decorator.Camera : camera.GetDevice();
+                return (IntPtr)GetInstanceField((EDCamera)cam, "_cam");
+            }
+            catch (Exception e)
             {
                 Logger.Error(e);
                 Notification.ShowError(e.Message);
