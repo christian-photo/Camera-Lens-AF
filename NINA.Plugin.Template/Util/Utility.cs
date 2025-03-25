@@ -10,6 +10,7 @@
 #endregion "copyright"
 
 using EDSDKLib;
+using Nikon;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
@@ -18,6 +19,7 @@ using NINA.Equipment.Interfaces.Mediator;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Windows;
 
 namespace LensAF.Util
 {
@@ -52,6 +54,29 @@ namespace LensAF.Util
                 return IntPtr.Zero;
             }
         }
+        public static NikonDevice GetNikonCamera(ICameraMediator camera)
+        {
+            try
+            {
+                List<string> errors = ValidateNikon(camera);
+                if (errors.Count > 0)
+                {
+                    foreach (string error in errors)
+                    {
+                        Notification.ShowError(error);
+                    }
+                    return null;
+                }
+                IDevice cam = camera.GetDevice() is PersistSettingsCameraDecorator decorator ? decorator.Camera : camera.GetDevice();
+                return (NikonDevice)GetInstanceField((NikonCamera)cam, "_camera");
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                Notification.ShowError(e.Message);
+                return null;
+            }
+        }
 
         public static List<string> Validate(ICameraMediator Camera)
         {
@@ -67,6 +92,25 @@ namespace LensAF.Util
             if (!(Camera.GetDevice().Category == "Canon" && cameraConnected))
             {
                 error.Add("No Canon camera connected");
+            }
+
+            return error;
+        }
+
+        public static List<string> ValidateNikon(ICameraMediator Camera)
+        {
+            List<string> error = new List<string>();
+            bool cameraConnected = Camera.GetInfo().Connected;
+
+            if (!cameraConnected)
+            {
+                error.Add("No camera connected");
+                return error;
+            }
+
+            if (!(Camera.GetDevice().Category == "Nikon" && cameraConnected))
+            {
+                error.Add("No Nikon camera connected");
             }
 
             return error;

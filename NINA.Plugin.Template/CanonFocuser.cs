@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#endregion "copyright"using System;
+#endregion "copyright"
 
 using Dasync.Collections;
 using EDSDKLib;
@@ -27,31 +27,7 @@ using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF
 {
-    [Export(typeof(IEquipmentProvider))]
-    public class FocusDriverProvider : IEquipmentProvider<IFocuser>
-    {
-        public string Name => "Canon Lens Driver";
-
-        public IList<IFocuser> GetEquipment()
-        {
-            List<string> errors = Utility.Validate(LensAF.Camera);
-            if (errors.Count == 0)
-            {
-                try
-                {
-                    CameraInfo info = new CameraInfo(Utility.GetCamera(LensAF.Camera));
-                    return new List<IFocuser>() { new FocusDriver(info.LensName) { Name = $"Canon Lens Driver ({info.LensName})" } };
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                }
-            }
-            return new List<IFocuser>();
-        }
-    }
-
-    public class FocusDriver : BaseINPC, IFocuser
+    public class CanonFocuser : BaseINPC, IFocuser
     {
         private bool _isMoving = false;
         public bool IsMoving
@@ -138,7 +114,7 @@ namespace LensAF
 
         public string DisplayName { get; set; } = "Canon Lens Driver";
 
-        public FocusDriver(string id)
+        public CanonFocuser(string id)
         {
             Id = id;
 
@@ -238,7 +214,13 @@ namespace LensAF
                         uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
                         if (error != EDSDK.EDS_ERR_OK)
                             Logger.Debug(Utility.ErrorCodeToString(error));
-                        Thread.Sleep(200);
+                        try
+                        {
+                            Task.Delay(200, ct);
+                        } catch (TaskCanceledException)
+                        {
+                            // Expected if cancellation is requested, no need to propagate the exception.
+                        }
                         diff -= StepSize;
                     }
                 }
@@ -249,7 +231,14 @@ namespace LensAF
                         uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
                         if (error != EDSDK.EDS_ERR_OK)
                             Logger.Debug(Utility.ErrorCodeToString(error));
-                        Thread.Sleep(200);
+                        try
+                        {
+                            Task.Delay(200, ct);
+                        }
+                        catch (TaskCanceledException)
+                        {
+                            // Expected if cancellation is requested, no need to propagate the exception.
+                        }
                         diff += StepSize;
                     }
                 }

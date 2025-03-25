@@ -36,9 +36,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("Tags", "AF,Sequencer,Canon")]
 
 //[Optional] An in-depth description of your plugin
-[assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attachted to Canon cameras
+[assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attachted to Canon and Nikon cameras
 
-To be able to use the driver, a Canon camera has to be connected
+To be able to use the driver, a Canon or Nikon camera has to be connected.
 
 ## Important Note!
 **Test the plugin before you use it in your imaging runs, because this plugin may not work for everyone! This plugin doesn't work with ASCOM.DSLR unfortuantely!**  
@@ -46,13 +46,14 @@ If you have questions/feedback/issues, you can ask on the [NINA discord](https:/
 
 
 **Requirements**:  
-- A Canon Camera,  
+- A Canon or Nikon Camera,  
 - A Camera Lens that supports AF
 
 The plugin was tested using the following camera and lenses (Note that there are often issues with third-party lenses, so be aware of that):
 - Canon EOS 600d
 - Canon EF 100-400 f/4.5-5.6 L IS USM
 - Canon EF 24-105 f/4 L IS USM
+- Nikon Z6 with Nikon Nikkor Z 70-200 f/2.8
 
 ## Manual Focus Control controls (The Manual Focus Control does not affect the focuser position!)
 - Mousewheel/Trackpad: Zoom in/out

@@ -27,13 +27,13 @@ namespace LensAF.Util
             EDSDK.EdsGetPropertyData(camera, 0x00000007, 0, out CameraFirmware);
         }
 
-        /* public CameraInfo(NikonDevice camera)
+        public CameraInfo(NikonDevice camera)
         {
             try
             {
-                CameraFirmware = camera.GetDefaultString(eNkMAIDCapability.kNkMAIDCapability_Firmware);
-                LensName = camera.GetDefaultString(eNkMAIDCapability.kNkMAIDCapability_LensInfo);
-                CameraName = camera.GetDefaultString(eNkMAIDCapability.kNkMAIDCapability_Name);
+                CameraFirmware = camera.GetString(eNkMAIDCapability.kNkMAIDCapability_Firmware);
+                LensName = camera.GetString(eNkMAIDCapability.kNkMAIDCapability_LensInfo);
+                CameraName = camera.GetString(eNkMAIDCapability.kNkMAIDCapability_Name);
             }
             catch
             {
@@ -41,6 +41,6 @@ namespace LensAF.Util
                 LensName = "Nikon Lens";
                 CameraName = "Nikon Camera";
             }
-        } */
+        }
     }
 }
