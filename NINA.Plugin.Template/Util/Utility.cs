@@ -54,6 +54,29 @@ namespace LensAF.Util
                 return IntPtr.Zero;
             }
         }
+        public static EDCamera GetCanon(ICameraMediator camera)
+        {
+            try
+            {
+                List<string> errors = Validate(camera);
+                if (errors.Count > 0)
+                {
+                    foreach (string error in errors)
+                    {
+                        Notification.ShowError(error);
+                    }
+                    return null;
+                }
+                IDevice cam = camera.GetDevice() is PersistSettingsCameraDecorator decorator ? decorator.Camera : camera.GetDevice();
+                return (EDCamera)cam;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                Notification.ShowError(e.Message);
+                return null;
+            }
+        }
         public static NikonDevice GetNikonCamera(ICameraMediator camera)
         {
             try

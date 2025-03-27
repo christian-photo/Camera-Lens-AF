@@ -15,6 +15,7 @@ using LensAF.Properties;
 using LensAF.Util;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
+using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
@@ -33,7 +34,7 @@ namespace LensAF
         public bool IsMoving
         {
             get => _isMoving;
-            set 
+            set
             {
                 _isMoving = value;
                 RaisePropertyChanged();
@@ -202,49 +203,54 @@ namespace LensAF
             }
             double diff = Position - position;
             IntPtr cam = Utility.GetCamera(LensAF.Camera);
-            CancellationTokenSource token = new CancellationTokenSource();
-            IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
+            CancellationTokenSource token = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            EDCamera c = Utility.GetCanon(LensAF.Camera);
 
-            await data.ForEachAsync(_ =>
+            bool wasOn = c.LiveViewEnabled;
+            if (!wasOn)
+                c.StartLiveView(new NINA.Equipment.Model.CaptureSequence());
+
+            if (diff > 0) // Drive focus near
             {
-                if (diff > 0) // Drive focus near
+                while (diff > 0)
                 {
-                    while (diff > 0)
+                    uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                    if (error != EDSDK.EDS_ERR_OK)
+                        Logger.Debug(Utility.ErrorCodeToString(error));
+                    try
                     {
-                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
-                        if (error != EDSDK.EDS_ERR_OK)
-                            Logger.Debug(Utility.ErrorCodeToString(error));
-                        try
-                        {
-                            Task.Delay(200, ct);
-                        } catch (TaskCanceledException)
-                        {
-                            // Expected if cancellation is requested, no need to propagate the exception.
-                        }
-                        diff -= StepSize;
+                        await Task.Delay(200, ct);
                     }
+                    catch (TaskCanceledException)
+                    {
+                        // Expected if cancellation is requested, no need to propagate the exception.
+                    }
+                    diff -= StepSize;
                 }
-                else // Drive focus far
+            }
+            else // Drive focus far
+            {
+                while (diff < 0)
                 {
-                    while (diff < 0)
+                    uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                    if (error != EDSDK.EDS_ERR_OK)
+                        Logger.Debug(Utility.ErrorCodeToString(error));
+                    try
                     {
-                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
-                        if (error != EDSDK.EDS_ERR_OK)
-                            Logger.Debug(Utility.ErrorCodeToString(error));
-                        try
-                        {
-                            Task.Delay(200, ct);
-                        }
-                        catch (TaskCanceledException)
-                        {
-                            // Expected if cancellation is requested, no need to propagate the exception.
-                        }
-                        diff += StepSize;
+                        await Task.Delay(200, ct);
                     }
+                    catch (TaskCanceledException)
+                    {
+                        // Expected if cancellation is requested, no need to propagate the exception.
+                    }
+                    diff += StepSize;
                 }
-                Position = position;
-                token.Cancel();
-            });
+            }
+            Position = position;
+            if (!wasOn)
+            {
+                c.StopLiveView();
+            }
             return;
         }
 

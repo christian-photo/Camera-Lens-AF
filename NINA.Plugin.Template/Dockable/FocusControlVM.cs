@@ -75,7 +75,7 @@ namespace LensAF.Dockable
         {
             Camera = cam;
             Instance = this;
-            
+
             Title = "Manual Focus Control";
             ResourceDictionary dict = new ResourceDictionary
             {
@@ -91,7 +91,7 @@ namespace LensAF.Dockable
                 IAsyncEnumerable<IExposureData> LiveView = Camera.LiveView(FocusControlToken.Token);
                 ManualFocusControl = true;
 
-                await LiveView.ForEachAsync(async exposure => 
+                await LiveView.ForEachAsync(async exposure =>
                 {
                     IImageData data = await exposure.ToImageData();
                     if (Settings.Default.PrepareImage)
@@ -117,22 +117,22 @@ namespace LensAF.Dockable
 
             MoveRight = new RelayCommand(async () =>
             {
-                await focuser.MoveFocuserRelative(10, FocusControlToken.Token);
+                await focuser.MoveFocuserRelative(2, FocusControlToken.Token);
             });
 
             MoveRightBig = new RelayCommand(async () =>
             {
-                await focuser.MoveFocuserRelative(100, FocusControlToken.Token);
+                await focuser.MoveFocuserRelative(10, FocusControlToken.Token);
             });
 
             MoveLeft = new RelayCommand(async () =>
             {
-                await focuser.MoveFocuserRelative(-10, FocusControlToken.Token);
+                await focuser.MoveFocuserRelative(-2, FocusControlToken.Token);
             });
 
             MoveLeftBig = new RelayCommand(async () =>
             {
-                await focuser.MoveFocuserRelative(-100, FocusControlToken.Token);
+                await focuser.MoveFocuserRelative(-10, FocusControlToken.Token);
             });
         }
     }
