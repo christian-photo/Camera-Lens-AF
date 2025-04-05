@@ -247,7 +247,7 @@ namespace LensAF
                 return;
             }
 
-            int diff = Position - position;
+            int diff = position - Position;
             await MoveRelative(diff, ct, waitInMs);
             Position = position;
         }
