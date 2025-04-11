@@ -13,21 +13,24 @@ using Dasync.Collections;
 using LensAF.Properties;
 using LensAF.Util;
 using Nikon;
+using NINA.Astrometry;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces;
 using NINA.Image.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Spatial;
 using System.Diagnostics;
+using System.Security.Cryptography.Xml;
 using System.Threading;
 using System.Threading.Tasks;
 using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF
 {
-    public class NikonFocuser : BaseINPC, IFocuser
+    public class NikonFocuser(string id) : BaseINPC, IFocuser
     {
         private bool _isMoving = false;
         public bool IsMoving
@@ -98,7 +101,7 @@ namespace LensAF
 
         public bool HasSetupDialog { get; set; } = false;
 
-        public string Id { get; set; }
+        public string Id { get; set; } = id;
 
         public string Category { get; set; } = "Nikon";
 
@@ -117,30 +120,12 @@ namespace LensAF
             get => Utility.GetNikonCamera(LensAF.Camera);
         }
 
-        public NikonFocuser(string id)
+        private async Task<bool> DriveManualFocus(eNkMAIDMFDrive direction, CancellationToken ct)
         {
-            Id = id;
-            NikonRange driveStep = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
-            MaxStep = (int)driveStep.Max;
-            MaxIncrement = (int)driveStep.Max;
-            StepSize = 10;
-        }
-        private void DriveManualFocus(eNkMAIDMFDrive direction, CancellationToken ct)
-        {
-            if (!ValidateCamera())
-            {
-                return;
-            }
-
-            if (Camera.LiveViewEnabled == false)
-            {
-                Camera.LiveViewEnabled = true;  // required for manual focus
-            }
-
             // Start driving the manual focus motor
             Camera.SetUnsigned(eNkMAIDCapability.kNkMAIDCapability_MFDrive, (uint)direction);
 
-            AwaitDeviceReady(ct);
+            return await AwaitDeviceReady(ct);
         }
 
         /**
@@ -148,10 +133,8 @@ namespace LensAF
          * 
          * Returns true if the camera is ready and false if the timeout expired.
          */
-        private bool AwaitDeviceReady(CancellationToken ct)
+        private async Task<bool> AwaitDeviceReady(CancellationToken ct)
         {
-            var stopwatch = Stopwatch.StartNew();
-
             while (true)
             {
                 try
@@ -163,8 +146,7 @@ namespace LensAF
                 {
                     if (e.ErrorCode == eNkMAIDResult.kNkMAIDResult_DeviceBusy)
                     {
-                        Task.Delay(50, ct);
-                        ct.ThrowIfCancellationRequested();
+                        await Task.Delay(50, ct);
                         continue;
                     }
 
@@ -184,23 +166,56 @@ namespace LensAF
             return string.Empty;
         }
 
-        public Task<bool> Connect(CancellationToken token)
+        public async Task<bool> Connect(CancellationToken ct)
         {
-            return Task.Run(() =>
+            if (!ValidateCamera())
             {
-                List<string> errors = Utility.ValidateNikon(LensAF.Camera);
-                if (errors.Count > 0)
+                return Connected;
+            }
+
+            await CalibrateCamera(ct);
+
+            Connected = true;
+            return Connected;
+        }
+
+        private async Task CalibrateCamera(CancellationToken ct)
+        {
+            async Task<bool> TryMove(int position, CancellationToken ct)
+            {
+                // Go to the closest possible position.
+                while (await MoveRelative(-MaxIncrement, ct))
                 {
-                    foreach (string error in errors)
-                    {
-                        Notification.ShowError(error);
-                    }
-                    return Connected;
+                    ct.ThrowIfCancellationRequested();
                 }
 
-                Connected = true;
-                return Connected;
-            });
+                // Try to move to the requested position.
+                return await MoveRelative(position, ct);
+            }
+
+            NikonRange driveStep = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
+            MaxIncrement = (int)driveStep.Max;
+            MaxStep = 0;
+
+            int increment = MaxIncrement;
+
+            // Perform a binary search to find the maximum allowed position.
+            while (increment > 0)
+            {
+                do
+                {
+                    MaxStep += increment;
+                    Logger.Info($"Trying to move to position {MaxStep}, increment = {increment}");
+                } while (await TryMove(MaxStep, ct));
+
+                MaxStep -= increment;
+                increment /= 8;
+            }
+
+            // Then move close to the far end of the focus range,
+            // since this is likely where we want to be.
+            Position = (int)(MaxStep * 0.98);
+            await TryMove(Position, ct);
         }
 
         public void Disconnect()
@@ -213,14 +228,13 @@ namespace LensAF
             return;
         }
 
-        private bool ValidateCamera()
+        private static bool ValidateCamera()
         {
             List<string> validation = Utility.ValidateNikon(LensAF.Camera);
 
             foreach (string issue in validation)
             {
                 Notification.ShowError(issue);
-                Logger.Error($"Cannot move focus: {issue}");
             }
 
             return validation.Count == 0;
@@ -233,28 +247,40 @@ namespace LensAF
                 return;
             }
 
-            double diff = Position - position;
+            int diff = position - Position;
+            await MoveRelative(diff, ct, waitInMs);
+            Position = position;
+        }
 
-            await Task.Run(() =>
+        private async Task<bool> MoveRelative(int diff, CancellationToken ct, int waitInMs = 1000)
+        {
+            if (Camera.LiveViewEnabled == false)
             {
-                if (diff > 0) // Drive focus near
-                {
-                    NikonRange range = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
-                    range.Value = diff;
-                    Camera.SetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep, range);
-                    DriveManualFocus(eNkMAIDMFDrive.kNkMAIDMFDrive_InfinityToClosest, ct);
-                }
-                else // Drive focus far
-                {
-                    NikonRange range = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
-                    range.Value = -diff;
-                    Camera.SetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep, range);
-                    DriveManualFocus(eNkMAIDMFDrive.kNkMAIDMFDrive_ClosestToInfinity, ct);
-                }
+                Camera.LiveViewEnabled = true;  // required for manual focus
+            }
 
-                Position = (int)position;
+            var direction = eNkMAIDMFDrive.kNkMAIDMFDrive_ClosestToInfinity;
+
+            if (diff < 0)
+            {
+                direction = eNkMAIDMFDrive.kNkMAIDMFDrive_InfinityToClosest;
+                diff = -diff;
+            }
+
+            while (diff > 0)
+            {
+                NikonRange range = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
+                range.Value = Math.Min(diff, range.Max);
+                diff -= (int) range.Value;
+                Camera.SetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep, range);
+                if (!await DriveManualFocus(direction, ct))
+                {
+                    return false;
+                }
                 ct.ThrowIfCancellationRequested();
-            });
+            }
+
+            return true;
         }
 
         public void SendCommandBlind(string command, bool raw = true)
