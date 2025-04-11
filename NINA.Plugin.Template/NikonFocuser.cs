@@ -125,7 +125,14 @@ namespace LensAF
             CalibrateLens = new AsyncRelayCommand(async () =>
             {
                 calibrationToken = new CancellationTokenSource();
-                await CalibrateCamera(calibrationToken.Token);
+                try
+                {
+                    await CalibrateCamera(calibrationToken.Token);
+                } catch (OperationCanceledException e)
+                {
+                    Notification.ShowInformation("Calibration canceled");
+                    Logger.Info($"Calibration canceled: {e.Message}");
+                }
             });
             CancelCalibrate = new RelayCommand(() =>
             {
