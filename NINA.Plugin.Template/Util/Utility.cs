@@ -54,7 +54,7 @@ namespace LensAF.Util
                 return IntPtr.Zero;
             }
         }
-        public static EDCamera GetCanon(ICameraMediator camera)
+        public static EDCamera GetCanonCamera(ICameraMediator camera)
         {
             try
             {

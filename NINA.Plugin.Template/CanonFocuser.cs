@@ -204,7 +204,7 @@ namespace LensAF
             double diff = Position - position;
             IntPtr cam = Utility.GetCamera(LensAF.Camera);
             CancellationTokenSource token = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            EDCamera c = Utility.GetCanon(LensAF.Camera);
+            EDCamera c = Utility.GetCanonCamera(LensAF.Camera);
 
             bool wasOn = c.LiveViewEnabled;
             if (!wasOn)

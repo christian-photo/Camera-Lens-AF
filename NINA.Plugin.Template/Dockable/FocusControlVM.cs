@@ -70,6 +70,8 @@ namespace LensAF.Dockable
             }
         }
 
+        private bool moving = false;
+
         [ImportingConstructor]
         public FocusControlVM(IProfileService profileService, ICameraMediator cam, IImagingMediator imaging, IFocuserMediator focuser) : base(profileService)
         {
@@ -108,7 +110,7 @@ namespace LensAF.Dockable
 
             StopFocusControl = new RelayCommand(() =>
             {
-                if (ManualFocusControl)
+                if (ManualFocusControl && !moving)
                 {
                     FocusControlToken?.Cancel();
                     ManualFocusControl = false;
@@ -117,22 +119,30 @@ namespace LensAF.Dockable
 
             MoveRight = new RelayCommand(async () =>
             {
+                moving = true;
                 await focuser.MoveFocuserRelative(2, FocusControlToken.Token);
+                moving = false;
             });
 
             MoveRightBig = new RelayCommand(async () =>
             {
+                moving = true;
                 await focuser.MoveFocuserRelative(10, FocusControlToken.Token);
+                moving = false;
             });
 
             MoveLeft = new RelayCommand(async () =>
             {
+                moving = true;
                 await focuser.MoveFocuserRelative(-2, FocusControlToken.Token);
+                moving = false;
             });
 
             MoveLeftBig = new RelayCommand(async () =>
             {
+                moving = true;
                 await focuser.MoveFocuserRelative(-10, FocusControlToken.Token);
+                moving = false;
             });
         }
     }
