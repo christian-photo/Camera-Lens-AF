@@ -9,6 +9,7 @@
 
 #endregion "copyright"
 
+using CommunityToolkit.Mvvm.Input;
 using LensAF.Properties;
 using LensAF.Util;
 using Nikon;
@@ -19,10 +20,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF
 {
-    public class NikonFocuser(string id) : BaseINPC, IFocuser
+    public class NikonFocuser : BaseINPC, IFocuser
     {
         private bool _isMoving = false;
         public bool IsMoving
@@ -93,7 +95,7 @@ namespace LensAF
 
         public bool HasSetupDialog { get; set; } = false;
 
-        public string Id { get; set; } = id;
+        public string Id { get; set; } = string.Empty;
 
         public string Category { get; set; } = "Nikon";
 
@@ -107,9 +109,28 @@ namespace LensAF
 
         public string DisplayName { get; set; } = "Nikon Lens Driver";
 
+        public AsyncRelayCommand CalibrateLens { get; set; }
+        public RelayCommand CancelCalibrate {  get; set; }
+
+        private CancellationTokenSource calibrationToken;
+
         private NikonDevice Camera
         {
             get => Utility.GetNikonCamera(LensAF.Camera);
+        }
+
+        public NikonFocuser(string id)
+        {
+            Id = id;
+            CalibrateLens = new AsyncRelayCommand(async () =>
+            {
+                calibrationToken = new CancellationTokenSource();
+                await CalibrateCamera(calibrationToken.Token);
+            });
+            CancelCalibrate = new RelayCommand(() =>
+            {
+                calibrationToken?.Cancel();
+            });
         }
 
         private async Task<bool> DriveManualFocus(eNkMAIDMFDrive direction, CancellationToken ct)

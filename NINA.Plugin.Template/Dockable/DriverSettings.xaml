@@ -8,7 +8,8 @@
 <ResourceDictionary
     x:Class="LensAF.Dockable.DriverSettings"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ninactrl="clr-namespace:NINA.CustomControlLibrary;assembly=NINA.CustomControlLibrary">
 
     <DataTemplate x:Key="LensAF.CanonFocuser_FocuserSettings">
         <Grid DataContext="{Binding}">
@@ -32,6 +33,31 @@
                     Command="{Binding CalibrateLens}"
                     Content="Calibrate Lens"
                     ToolTip="Recommended to click before every imaging session, resets focus position" />
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+
+    <DataTemplate x:Key="LensAF.NikonFocuser_FocuserSettings">
+        <Grid DataContext="{Binding}">
+            <StackPanel Orientation="Vertical">
+                <!--<StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        Margin="0,0,10,0"
+                        Text="StepSize/Resolution"
+                        ToolTip="Recommended to be left at 1. Instead change the Autofocus step size" />
+                    <TextBox
+                        Width="100"
+                        Text="{Binding StepSize}"
+                        ToolTip="Recommended to be left at 1. Instead change the Autofocus step size" />
+                </StackPanel>-->
+                <ninactrl:CancellableButton
+                    Width="125"
+                    Height="40"
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Left"
+                    CancelCommand="{Binding CancelCalibrate}"
+                    Command="{Binding CalibrateLens}"
+                    Content="Calibrate Lens" />
             </StackPanel>
         </Grid>
     </DataTemplate>
