@@ -9,24 +9,16 @@
 
 #endregion "copyright"
 
-using Dasync.Collections;
 using LensAF.Properties;
 using LensAF.Util;
 using Nikon;
-using NINA.Astrometry;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
-using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces;
-using NINA.Image.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Spatial;
-using System.Diagnostics;
-using System.Security.Cryptography.Xml;
 using System.Threading;
 using System.Threading.Tasks;
-using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF
 {
@@ -271,7 +263,7 @@ namespace LensAF
             {
                 NikonRange range = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
                 range.Value = Math.Min(diff, range.Max);
-                diff -= (int) range.Value;
+                diff -= (int)range.Value;
                 Camera.SetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep, range);
                 if (!await DriveManualFocus(direction, ct))
                 {

@@ -143,6 +143,8 @@ namespace LensAF
                             Logger.Debug(Utility.ErrorCodeToString(error));
                         Thread.Sleep(200);
                     }
+                    EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
+                    Thread.Sleep(200);
                     token.Cancel();
                 });
                 IsMoving = false;
