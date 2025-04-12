@@ -57,7 +57,10 @@
                     HorizontalAlignment="Left"
                     CancelCommand="{Binding CancelCalibrate}"
                     Command="{Binding CalibrateLens}"
-                    Content="Calibrate Lens" />
+                    ButtonText="Calibrate Lens"
+                    CancelButtonImage="{StaticResource CancelSVG}"
+                    CancelToolTip="Cancel calibration"
+                    ToolTip="Recommended to click after every focal length change." />
             </StackPanel>
         </Grid>
     </DataTemplate>
