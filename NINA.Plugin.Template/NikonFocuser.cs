@@ -216,34 +216,41 @@ namespace LensAF
             MaxIncrement = (int)driveStep.Max;
             MaxStep = 0;
 
-            async Task FindLimit(int increment)
+            async Task<bool> TryMove(int position)
             {
                 while (await MoveRelative(-MaxIncrement, ct)) ;
-                await MoveRelative(MaxStep, ct);
-                while (await MoveRelative(increment, ct))
-                {
-                    MaxStep += increment;
-                }
+                return await MoveRelative(position, ct);
             }
 
-            await FindLimit(1000);
-            await FindLimit(100);
-            await FindLimit(10);
+            int lowerBound = 0;
+            int upperBound = MaxIncrement;
 
-            // Don't go below a step size of 10, because this seems to cause the camera
-            // to go into a non-recoverable busy state with some lenses (until the camera
-            // is turned off and on again).  Tested with a Z6 and a 24-70/2.8 S lens.
-            // Instead, we just increment MaxStep by 10, ensuring that this is definitely
-            // beyond the max position for the focus range.
+            while (await MoveRelative(upperBound + MaxIncrement, ct))
+            {
+                upperBound += MaxIncrement;
+            }
 
-            MaxStep += 10;
+            do
+            {
+                int mid = (upperBound + lowerBound) / 2;
 
-            // Then move close to the far end of the focus range,
+                if (await TryMove(mid))
+                {
+                    lowerBound = mid;
+                }
+                else
+                {
+                    upperBound = mid;
+                }
+            } while (upperBound - lowerBound > 1);
+
+            MaxStep = lowerBound;
+
+            // Move close to the far end of the focus range,
             // since this is likely where we want to be.
             Position = (int)(MaxStep * 0.98);
 
-            while (await MoveRelative(-MaxIncrement, ct)) ;
-            await MoveRelative(Position, ct);
+            await TryMove(Position);
         }
 
         public void Disconnect()
