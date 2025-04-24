@@ -212,45 +212,45 @@ namespace LensAF
 
         private async Task CalibrateCamera(CancellationToken ct)
         {
-            NikonRange driveStep = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
-            MaxIncrement = (int)driveStep.Max;
-            MaxStep = 0;
-
-            async Task<bool> TryMove(int position)
+            async Task<bool> TryMove(int position, CancellationToken ct)
             {
-                while (await MoveRelative(-MaxIncrement, ct)) ;
+                // Go to the closest possible position.
+                while (await MoveRelative(-MaxIncrement, ct))
+                {
+                    ct.ThrowIfCancellationRequested();
+                }
+
+                // Try to move to the requested position.
                 return await MoveRelative(position, ct);
             }
 
-            int lowerBound = 0;
-            int upperBound = MaxIncrement;
+            NikonRange driveStep = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
+            MaxIncrement = (int)driveStep.Max;
+            Position = (int)driveStep.Max;
+            MaxStep = (int)driveStep.Max;
+            MaxStep = 0;
 
-            while (await MoveRelative(upperBound + MaxIncrement, ct))
+            // This moves the camera to the near end of the focus range and
+            // sets the position to 0.
+            await Move(0, ct);
+            int increment = MaxIncrement;
+
+            // Perform a binary search to find the maximum allowed position.
+            while (increment > 0)
             {
-                upperBound += MaxIncrement;
+                do
+                {
+                    MaxStep += increment;
+                } while (await TryMove(MaxStep, ct));
+
+                MaxStep -= increment;
+                increment /= 8;
             }
 
-            do
-            {
-                int mid = (upperBound + lowerBound) / 2;
-
-                if (await TryMove(mid))
-                {
-                    lowerBound = mid;
-                }
-                else
-                {
-                    upperBound = mid;
-                }
-            } while (upperBound - lowerBound > 1);
-
-            MaxStep = lowerBound;
-
-            // Move close to the far end of the focus range,
+            // Then move close to the far end of the focus range,
             // since this is likely where we want to be.
             Position = (int)(MaxStep * 0.98);
-
-            await TryMove(Position);
+            await TryMove(Position, ct);
         }
 
         public void Disconnect()
