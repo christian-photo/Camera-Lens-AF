@@ -28,6 +28,7 @@ using System.Runtime.InteropServices;
 // The url to the license
 [assembly: AssemblyMetadata("LicenseURL", "https://www.mozilla.org/en-US/MPL/2.0/")]
 [assembly: AssemblyMetadata("Repository", "https://github.com/rennmaus-coder/Camera-Lens-AF")]
+[assembly: AssemblyMetadata("Homepage", "https://buymeacoffee.com/christian.palm")]
 
 
 // The following attributes are optional for the official manifest meta data
