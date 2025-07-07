@@ -83,9 +83,19 @@ namespace LensAF
             }
         }
 
-        public int MaxIncrement { get; set; } = 10000;
+        private int _maxIncrement = 10000;
+        public int MaxIncrement
+        {
+            get => _maxIncrement;
+            set { _maxIncrement = value; RaisePropertyChanged(); }
+        }
 
-        public int MaxStep { get; set; } = 10000;
+        private int _maxStep = 10000;
+        public int MaxStep
+        {
+            get => _maxStep;
+            set { _maxStep = value; RaisePropertyChanged(); }
+        }
 
         public bool TempCompAvailable { get; set; } = false;
 
@@ -110,7 +120,7 @@ namespace LensAF
         public string DisplayName { get; set; } = "Nikon Lens Driver";
 
         public AsyncRelayCommand CalibrateLens { get; set; }
-        public RelayCommand CancelCalibrate {  get; set; }
+        public RelayCommand CancelCalibrate { get; set; }
 
         private CancellationTokenSource calibrationToken;
 
@@ -125,7 +135,15 @@ namespace LensAF
             CalibrateLens = new AsyncRelayCommand(async () =>
             {
                 calibrationToken = new CancellationTokenSource();
-                await CalibrateCamera(calibrationToken.Token);
+                try
+                {
+                    await CalibrateCamera(calibrationToken.Token);
+                }
+                catch (OperationCanceledException e)
+                {
+                    Notification.ShowInformation("Calibration canceled");
+                    Logger.Info($"Calibration canceled: {e.Message}");
+                }
             });
             CancelCalibrate = new RelayCommand(() =>
             {
@@ -208,8 +226,13 @@ namespace LensAF
 
             NikonRange driveStep = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
             MaxIncrement = (int)driveStep.Max;
+            Position = (int)driveStep.Max;
+            MaxStep = (int)driveStep.Max;
             MaxStep = 0;
 
+            // This moves the camera to the near end of the focus range and
+            // sets the position to 0.
+            await Move(0, ct);
             int increment = MaxIncrement;
 
             // Perform a binary search to find the maximum allowed position.
@@ -218,7 +241,6 @@ namespace LensAF
                 do
                 {
                     MaxStep += increment;
-                    Logger.Info($"Trying to move to position {MaxStep}, increment = {increment}");
                 } while (await TryMove(MaxStep, ct));
 
                 MaxStep -= increment;
@@ -280,17 +302,25 @@ namespace LensAF
                 diff = -diff;
             }
 
-            while (diff > 0)
+            try
             {
-                NikonRange range = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
-                range.Value = Math.Min(diff, range.Max);
-                diff -= (int)range.Value;
-                Camera.SetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep, range);
-                if (!await DriveManualFocus(direction, ct))
+                IsMoving = true;
+
+                while (diff > 0)
                 {
-                    return false;
+                    NikonRange range = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
+                    range.Value = Math.Min(diff, range.Max);
+                    diff -= (int)range.Value;
+                    Camera.SetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep, range);
+                    if (!await DriveManualFocus(direction, ct))
+                    {
+                        return false;
+                    }
+                    ct.ThrowIfCancellationRequested();
                 }
-                ct.ThrowIfCancellationRequested();
+            } finally
+            {
+                IsMoving = false;
             }
 
             return true;
