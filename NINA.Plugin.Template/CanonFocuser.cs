@@ -141,10 +141,10 @@ namespace LensAF
                         uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
                         if (error != EDSDK.EDS_ERR_OK)
                             Logger.Debug(Utility.ErrorCodeToString(error));
-                        Thread.Sleep(200);
+                        Thread.Sleep(100);
                     }
                     EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
-                    Thread.Sleep(200);
+                    Thread.Sleep(100);
                     token.Cancel();
                 });
                 IsMoving = false;
@@ -221,7 +221,7 @@ namespace LensAF
                         Logger.Debug(Utility.ErrorCodeToString(error));
                     try
                     {
-                        await Task.Delay(200, ct);
+                        await Task.Delay(100, ct);
                     }
                     catch (TaskCanceledException)
                     {
@@ -239,7 +239,7 @@ namespace LensAF
                         Logger.Debug(Utility.ErrorCodeToString(error));
                     try
                     {
-                        await Task.Delay(200, ct);
+                        await Task.Delay(100, ct);
                     }
                     catch (TaskCanceledException)
                     {

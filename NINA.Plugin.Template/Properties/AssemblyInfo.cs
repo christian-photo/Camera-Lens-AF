@@ -6,13 +6,13 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("2.2.0.0")]
-[assembly: AssemblyFileVersion("2.2.0.0")]
+[assembly: AssemblyVersion("3.0.0.0")]
+[assembly: AssemblyFileVersion("3.0.0.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
 // [MANDATORY] A short description of your plugin
-[assembly: AssemblyDescription("Run AF with your Camera Lens!")]
+[assembly: AssemblyDescription("Run AF with your Camera Lens! (Requires Canon or Nikon camera)")]
 
 // Your name
 [assembly: AssemblyCompany("Christian Palm")]
@@ -21,20 +21,20 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 
 // The minimum Version of N.I.N.A. that this plugin is compatible with
-[assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.2017")]
+[assembly: AssemblyMetadata("MinimumApplicationVersion", "3.2.0.2001")]
 
 // The license your plugin code is using
 [assembly: AssemblyMetadata("License", "MPL-2.0")]
 // The url to the license
 [assembly: AssemblyMetadata("LicenseURL", "https://www.mozilla.org/en-US/MPL/2.0/")]
-[assembly: AssemblyMetadata("Repository", "https://github.com/rennmaus-coder/Camera-Lens-AF")]
+[assembly: AssemblyMetadata("Repository", "https://github.com/christian-photo/Camera-Lens-AF")]
 [assembly: AssemblyMetadata("Homepage", "https://buymeacoffee.com/christian.palm")]
 
 
 // The following attributes are optional for the official manifest meta data
 
 //[Optional] Common tags that quickly describe your plugin
-[assembly: AssemblyMetadata("Tags", "AF,Sequencer,Canon")]
+[assembly: AssemblyMetadata("Tags", "AF,Sequencer,Canon,Nikon,Focuser")]
 
 //[Optional] An in-depth description of your plugin
 [assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attachted to Canon and Nikon cameras
@@ -43,7 +43,7 @@ To be able to use the driver, a Canon or Nikon camera has to be connected.
 
 ## Important Note!
 **Test the plugin before you use it in your imaging runs, because this plugin may not work for everyone! This plugin doesn't work with ASCOM.DSLR unfortuantely!**  
-If you have questions/feedback/issues, you can ask on the [NINA discord](https://discord.com/invite/nighttime-imaging) in #plugin-discussions or create an issue [here](https://github.com/rennmaus-coder/Camera-Lens-AF/issues)
+If you have questions/feedback/issues, you can ask on the [NINA discord](https://discord.com/invite/nighttime-imaging) in #plugin-discussions or create an issue [here](https://github.com/christian-photo/Camera-Lens-AF/issues)
 
 
 **Requirements**:  
