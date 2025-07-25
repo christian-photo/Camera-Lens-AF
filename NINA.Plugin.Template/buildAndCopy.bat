@@ -16,7 +16,7 @@ cd ..
 cd ..
 cd nina.plugin.manifests
 git pull
-git pull https://AstroChris23@bitbucket.org/Isbeorn/nina.plugin.manifests.git
+git pull https://github.com/isbeorn/nina.plugin.manifests.git
 mkdir "manifests\l\Lens AF\3.0.0\"
 copy "..\LensAF\LensAF\NINA.Plugin.Template\manifest.json" "manifests\l\Lens AF\3.0.0\manifest.json"
 echo "Testing the manifest"

@@ -51,7 +51,7 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="FocusStopPosition" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10000</Value>
+      <Value Profile="(Default)">5000</Value>
     </Setting>
     <Setting Name="IsFirstLaunch" Type="System.String" Scope="User">
       <Value Profile="(Default)">True</Value>
