@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("2.1.0.3")]
-[assembly: AssemblyFileVersion("2.1.0.3")]
+[assembly: AssemblyVersion("2.2.0.0")]
+[assembly: AssemblyFileVersion("2.2.0.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Christian Palm")]
 // The product name that this plugin is part of
 [assembly: AssemblyProduct("Camera Lens AF")]
-[assembly: AssemblyCopyright("Copyright ©  2024")]
+[assembly: AssemblyCopyright("Copyright ©  2025")]
 
 // The minimum Version of N.I.N.A. that this plugin is compatible with
 [assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.2017")]
@@ -28,6 +28,7 @@ using System.Runtime.InteropServices;
 // The url to the license
 [assembly: AssemblyMetadata("LicenseURL", "https://www.mozilla.org/en-US/MPL/2.0/")]
 [assembly: AssemblyMetadata("Repository", "https://github.com/rennmaus-coder/Camera-Lens-AF")]
+[assembly: AssemblyMetadata("Homepage", "https://buymeacoffee.com/christian.palm")]
 
 
 // The following attributes are optional for the official manifest meta data
@@ -36,9 +37,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("Tags", "AF,Sequencer,Canon")]
 
 //[Optional] An in-depth description of your plugin
-[assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attachted to Canon cameras
+[assembly: AssemblyMetadata("LongDescription", @"This plugin provides a focuser driver for lenses attachted to Canon and Nikon cameras
 
-To be able to use the driver, a Canon camera has to be connected
+To be able to use the driver, a Canon or Nikon camera has to be connected.
 
 ## Important Note!
 **Test the plugin before you use it in your imaging runs, because this plugin may not work for everyone! This plugin doesn't work with ASCOM.DSLR unfortuantely!**  
@@ -46,13 +47,14 @@ If you have questions/feedback/issues, you can ask on the [NINA discord](https:/
 
 
 **Requirements**:  
-- A Canon Camera,  
+- A Canon or Nikon Camera,  
 - A Camera Lens that supports AF
 
 The plugin was tested using the following camera and lenses (Note that there are often issues with third-party lenses, so be aware of that):
 - Canon EOS 600d
 - Canon EF 100-400 f/4.5-5.6 L IS USM
 - Canon EF 24-105 f/4 L IS USM
+- Nikon Z6 with Nikon Nikkor Z 70-200 f/2.8
 
 ## Manual Focus Control controls (The Manual Focus Control does not affect the focuser position!)
 - Mousewheel/Trackpad: Zoom in/out

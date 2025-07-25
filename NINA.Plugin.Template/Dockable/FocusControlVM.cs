@@ -16,6 +16,7 @@ using LensAF.Properties;
 using LensAF.Util;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
+using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.Mediator;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
@@ -69,8 +70,10 @@ namespace LensAF.Dockable
             }
         }
 
+        private bool moving = false;
+
         [ImportingConstructor]
-        public FocusControlVM(IProfileService profileService, ICameraMediator cam, IImagingMediator imaging) : base(profileService)
+        public FocusControlVM(IProfileService profileService, ICameraMediator cam, IImagingMediator imaging, IFocuserMediator focuser) : base(profileService)
         {
             Camera = cam;
             Instance = this;
@@ -86,22 +89,11 @@ namespace LensAF.Dockable
 
             StartFocusControl = new AsyncRelayCommand(async _ =>
             {
-                List<string> Issues = Utility.Validate(cam);
-                if (Issues.Count > 0)
-                {
-                    foreach (string issue in Issues)
-                    {
-                        Notification.ShowError($"Can't start Focus Control: {issue}");
-                        Logger.Error($"Can't start Focus Control: {issue}");
-                    }
-                    return;
-                }
                 FocusControlToken = new CancellationTokenSource();
                 IAsyncEnumerable<IExposureData> LiveView = Camera.LiveView(FocusControlToken.Token);
                 ManualFocusControl = true;
 
-
-                await LiveView.ForEachAsync(async exposure => 
+                await LiveView.ForEachAsync(async exposure =>
                 {
                     IImageData data = await exposure.ToImageData();
                     if (Settings.Default.PrepareImage)
@@ -118,39 +110,39 @@ namespace LensAF.Dockable
 
             StopFocusControl = new RelayCommand(() =>
             {
-                if (ManualFocusControl)
+                if (ManualFocusControl && !moving)
                 {
                     FocusControlToken?.Cancel();
                     ManualFocusControl = false;
                 }
             });
 
-            MoveRight = new RelayCommand(() =>
+            MoveRight = new RelayCommand(async () =>
             {
-                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
-                if (error != EDSDK.EDS_ERR_OK)
-                    Logger.Debug(Utility.ErrorCodeToString(error));
+                moving = true;
+                await focuser.MoveFocuserRelative(2, FocusControlToken.Token);
+                moving = false;
             });
 
-            MoveRightBig = new RelayCommand(() =>
+            MoveRightBig = new RelayCommand(async () =>
             {
-                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far2);
-                if (error != EDSDK.EDS_ERR_OK)
-                    Logger.Debug(Utility.ErrorCodeToString(error));
+                moving = true;
+                await focuser.MoveFocuserRelative(10, FocusControlToken.Token);
+                moving = false;
             });
 
-            MoveLeft = new RelayCommand(() =>
+            MoveLeft = new RelayCommand(async () =>
             {
-                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
-                if (error != EDSDK.EDS_ERR_OK)
-                    Logger.Debug(Utility.ErrorCodeToString(error));
+                moving = true;
+                await focuser.MoveFocuserRelative(-2, FocusControlToken.Token);
+                moving = false;
             });
 
-            MoveLeftBig = new RelayCommand(() =>
+            MoveLeftBig = new RelayCommand(async () =>
             {
-                uint error = EDSDK.EdsSendCommand(Utility.GetCamera(Camera), EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
-                if (error != EDSDK.EDS_ERR_OK)
-                    Logger.Debug(Utility.ErrorCodeToString(error));
+                moving = true;
+                await focuser.MoveFocuserRelative(-10, FocusControlToken.Token);
+                moving = false;
             });
         }
     }

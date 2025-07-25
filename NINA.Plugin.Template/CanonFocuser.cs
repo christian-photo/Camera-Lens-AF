@@ -7,7 +7,7 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-#endregion "copyright"using System;
+#endregion "copyright"
 
 using Dasync.Collections;
 using EDSDKLib;
@@ -15,6 +15,7 @@ using LensAF.Properties;
 using LensAF.Util;
 using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
+using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.Image.Interfaces;
@@ -27,37 +28,13 @@ using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF
 {
-    [Export(typeof(IEquipmentProvider))]
-    public class FocusDriverProvider : IEquipmentProvider<IFocuser>
-    {
-        public string Name => "Canon Lens Driver";
-
-        public IList<IFocuser> GetEquipment()
-        {
-            List<string> errors = Utility.Validate(LensAF.Camera);
-            if (errors.Count == 0)
-            {
-                try
-                {
-                    CameraInfo info = new CameraInfo(Utility.GetCamera(LensAF.Camera));
-                    return new List<IFocuser>() { new FocusDriver(info.LensName) { Name = $"Canon Lens Driver ({info.LensName})" } };
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                }
-            }
-            return new List<IFocuser>();
-        }
-    }
-
-    public class FocusDriver : BaseINPC, IFocuser
+    public class CanonFocuser : BaseINPC, IFocuser
     {
         private bool _isMoving = false;
         public bool IsMoving
         {
             get => _isMoving;
-            set 
+            set
             {
                 _isMoving = value;
                 RaisePropertyChanged();
@@ -138,7 +115,7 @@ namespace LensAF
 
         public string DisplayName { get; set; } = "Canon Lens Driver";
 
-        public FocusDriver(string id)
+        public CanonFocuser(string id)
         {
             Id = id;
 
@@ -166,6 +143,8 @@ namespace LensAF
                             Logger.Debug(Utility.ErrorCodeToString(error));
                         Thread.Sleep(200);
                     }
+                    EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
+                    Thread.Sleep(200);
                     token.Cancel();
                 });
                 IsMoving = false;
@@ -226,36 +205,54 @@ namespace LensAF
             }
             double diff = Position - position;
             IntPtr cam = Utility.GetCamera(LensAF.Camera);
-            CancellationTokenSource token = new CancellationTokenSource();
-            IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
+            CancellationTokenSource token = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            EDCamera c = Utility.GetCanonCamera(LensAF.Camera);
 
-            await data.ForEachAsync(_ =>
+            bool wasOn = c.LiveViewEnabled;
+            if (!wasOn)
+                c.StartLiveView(new NINA.Equipment.Model.CaptureSequence());
+
+            if (diff > 0) // Drive focus near
             {
-                if (diff > 0) // Drive focus near
+                while (diff > 0)
                 {
-                    while (diff > 0)
+                    uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
+                    if (error != EDSDK.EDS_ERR_OK)
+                        Logger.Debug(Utility.ErrorCodeToString(error));
+                    try
                     {
-                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
-                        if (error != EDSDK.EDS_ERR_OK)
-                            Logger.Debug(Utility.ErrorCodeToString(error));
-                        Thread.Sleep(200);
-                        diff -= StepSize;
+                        await Task.Delay(200, ct);
                     }
+                    catch (TaskCanceledException)
+                    {
+                        // Expected if cancellation is requested, no need to propagate the exception.
+                    }
+                    diff -= StepSize;
                 }
-                else // Drive focus far
+            }
+            else // Drive focus far
+            {
+                while (diff < 0)
                 {
-                    while (diff < 0)
+                    uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
+                    if (error != EDSDK.EDS_ERR_OK)
+                        Logger.Debug(Utility.ErrorCodeToString(error));
+                    try
                     {
-                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
-                        if (error != EDSDK.EDS_ERR_OK)
-                            Logger.Debug(Utility.ErrorCodeToString(error));
-                        Thread.Sleep(200);
-                        diff += StepSize;
+                        await Task.Delay(200, ct);
                     }
+                    catch (TaskCanceledException)
+                    {
+                        // Expected if cancellation is requested, no need to propagate the exception.
+                    }
+                    diff += StepSize;
                 }
-                Position = position;
-                token.Cancel();
-            });
+            }
+            Position = position;
+            if (!wasOn)
+            {
+                c.StopLiveView();
+            }
             return;
         }
 
