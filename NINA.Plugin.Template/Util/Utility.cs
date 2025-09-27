@@ -31,17 +31,21 @@ namespace LensAF.Util
             FieldInfo field = typeof(T).GetField(fieldName, bindFlags);
             return field.GetValue(instance);
         }
-        public static IntPtr GetCamera(ICameraMediator camera)
+        public static IntPtr GetCamera(ICameraMediator camera, bool showError = true)
         {
             try
             {
                 List<string> errors = Validate(camera);
                 if (errors.Count > 0)
                 {
-                    foreach (string error in errors)
+                    if (showError)
                     {
-                        Notification.ShowError(error);
+                        foreach (string error in errors)
+                        {
+                            Notification.ShowError(error);
+                        }
                     }
+
                     return IntPtr.Zero;
                 }
                 IDevice cam = camera.GetDevice() is PersistSettingsCameraDecorator decorator ? decorator.Camera : camera.GetDevice();
@@ -54,16 +58,19 @@ namespace LensAF.Util
                 return IntPtr.Zero;
             }
         }
-        public static EDCamera GetCanonCamera(ICameraMediator camera)
+        public static EDCamera GetCanonCamera(ICameraMediator camera, bool showError = true)
         {
             try
             {
                 List<string> errors = Validate(camera);
                 if (errors.Count > 0)
                 {
-                    foreach (string error in errors)
+                    if (showError)
                     {
-                        Notification.ShowError(error);
+                        foreach (string error in errors)
+                        {
+                            Notification.ShowError(error);
+                        }
                     }
                     return null;
                 }
@@ -77,16 +84,19 @@ namespace LensAF.Util
                 return null;
             }
         }
-        public static NikonDevice GetNikonCamera(ICameraMediator camera)
+        public static NikonDevice GetNikonCamera(ICameraMediator camera, bool showError = true)
         {
             try
             {
                 List<string> errors = ValidateNikon(camera);
                 if (errors.Count > 0)
                 {
-                    foreach (string error in errors)
+                    if (showError)
                     {
-                        Notification.ShowError(error);
+                        foreach (string error in errors)
+                        {
+                            Notification.ShowError(error);
+                        }
                     }
                     return null;
                 }

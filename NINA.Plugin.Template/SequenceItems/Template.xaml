@@ -1,0 +1,24 @@
+<ResourceDictionary
+    x:Class="LensAF.SequenceItems.Template"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:LensAF.SequenceItems"
+    xmlns:mini="clr-namespace:NINA.View.Sequencer.MiniSequencer;assembly=NINA.Sequencer"
+    xmlns:nina="clr-namespace:NINA.View.Sequencer;assembly=NINA.Sequencer">
+
+    <DataTemplate DataType="{x:Type local:SetAperture}">
+        <nina:SequenceBlockView DataContext="{Binding}">
+            <nina:SequenceBlockView.SequenceItemContent>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Aperture" />
+                    <ComboBox
+                        Width="100"
+                        Margin="5,0,0,0"
+                        ItemsSource="{Binding Apertures}"
+                        SelectedItem="{Binding SelectedAperture}" />
+                    <Button Margin="5,0,0,0" Command="{Binding RefreshCommand}" Content="Refresh" Width="100" ToolTip="Refreshes the list of available apertures. When changing the focal length, it can take a few seconds until the apertures are updated, so you might have to refresh a few times." />
+                </StackPanel>
+            </nina:SequenceBlockView.SequenceItemContent>
+        </nina:SequenceBlockView>
+    </DataTemplate>
+</ResourceDictionary>

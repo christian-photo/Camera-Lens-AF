@@ -1,4 +1,4 @@
-dotnet build C:\Users\Christian\source\repos\NINA\LensAF\LensAF\NINA.Plugin.Template\LensAF.csproj /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:Configuration=Release /p:Platform="AnyCPU"
+dotnet build C:\Users\Christian\source\repos\NINA\Camera-Lens-AF\NINA.Plugin.Template\LensAF.csproj /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary /p:Configuration=Release /p:Platform="AnyCPU"
 set /p "beta=Should this be a beta release? y/n: "
 echo "%beta%"
 set /p "version=Version: "
@@ -13,12 +13,11 @@ if "%beta%" == "y" (
 )
 cd ..
 cd ..
-cd ..
 cd nina.plugin.manifests
 git pull
 git pull https://github.com/isbeorn/nina.plugin.manifests.git
 mkdir "manifests\l\Lens AF\3.0.0\"
-copy "..\LensAF\LensAF\NINA.Plugin.Template\manifest.json" "manifests\l\Lens AF\3.0.0\manifest.json"
+copy "..\Camera-Lens-AF\NINA.Plugin.Template\manifest.json" "manifests\l\Lens AF\3.0.0\manifest.json"
 echo "Testing the manifest"
 node gather
 echo "Please verify that the test ran successfully"
