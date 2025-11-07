@@ -59,18 +59,7 @@ namespace LensAF
             }
         }
 
-        private double _stepSize = 1;
-        public double StepSize
-        {
-            get => _stepSize;
-            set
-            {
-                _stepSize = value;
-                Settings.Default.Resolution = value;
-                CoreUtil.SaveSettings(Settings.Default);
-                RaisePropertyChanged();
-            }
-        }
+        public double StepSize { get; } = 1;
 
         private string _name = "Nikon Lens Driver";
         public string Name
@@ -132,6 +121,9 @@ namespace LensAF
         public NikonFocuser(string id)
         {
             Id = id;
+
+            DisplayName = $"Nikon Lens Driver ({id})";
+
             CalibrateLens = new AsyncRelayCommand(async () =>
             {
                 calibrationToken = new CancellationTokenSource();
@@ -206,11 +198,13 @@ namespace LensAF
 
             await CalibrateCamera(ct);
 
+            LensAF.AddLensConfigIfNecessary(DisplayName);
+
             Connected = true;
             return Connected;
         }
 
-        private async Task CalibrateCamera(CancellationToken ct)
+        public async Task CalibrateCamera(CancellationToken ct)
         {
             async Task<bool> TryMove(int position, CancellationToken ct)
             {
@@ -223,6 +217,8 @@ namespace LensAF
                 // Try to move to the requested position.
                 return await MoveRelative(position, ct);
             }
+
+            LensAF.AddLensConfigIfNecessary(DisplayName);
 
             NikonRange driveStep = Camera.GetRange(eNkMAIDCapability.kNkMAIDCapability_MFDriveStep);
             MaxIncrement = (int)driveStep.Max;
@@ -251,6 +247,12 @@ namespace LensAF
             // since this is likely where we want to be.
             Position = (int)(MaxStep * 0.98);
             await TryMove(Position, ct);
+
+            int focusPosition = LensAF.GetFocusPosition(Name);
+            if (focusPosition > 0)
+            {
+                await Move(focusPosition, ct);
+            }
         }
 
         public void Disconnect()
@@ -318,7 +320,8 @@ namespace LensAF
                     }
                     ct.ThrowIfCancellationRequested();
                 }
-            } finally
+            }
+            finally
             {
                 IsMoving = false;
             }

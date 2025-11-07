@@ -37,114 +37,6 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int SelectedStepSize {
-            get {
-                return ((int)(this["SelectedStepSize"]));
-            }
-            set {
-                this["SelectedStepSize"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public double ExposureTime {
-            get {
-                return ((double)(this["ExposureTime"]));
-            }
-            set {
-                this["ExposureTime"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int StepSizeBig {
-            get {
-                return ((int)(this["StepSizeBig"]));
-            }
-            set {
-                this["StepSizeBig"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public int StepSizeSmall {
-            get {
-                return ((int)(this["StepSizeSmall"]));
-            }
-            set {
-                this["StepSizeSmall"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UseMixedStepSize {
-            get {
-                return ((bool)(this["UseMixedStepSize"]));
-            }
-            set {
-                this["UseMixedStepSize"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int StepSizeLogic {
-            get {
-                return ((int)(this["StepSizeLogic"]));
-            }
-            set {
-                this["StepSizeLogic"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int AutoFocusLogic {
-            get {
-                return ((int)(this["AutoFocusLogic"]));
-            }
-            set {
-                this["AutoFocusLogic"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string AutoFocusProfiles {
-            get {
-                return ((string)(this["AutoFocusProfiles"]));
-            }
-            set {
-                this["AutoFocusProfiles"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool ButtonEnabled {
-            get {
-                return ((bool)(this["ButtonEnabled"]));
-            }
-            set {
-                this["ButtonEnabled"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool PrepareImage {
             get {
@@ -181,42 +73,6 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("9")]
-        public int Iterations {
-            get {
-                return ((int)(this["Iterations"]));
-            }
-            set {
-                this["Iterations"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int InitialOffset {
-            get {
-                return ((int)(this["InitialOffset"]));
-            }
-            set {
-                this["InitialOffset"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double Resolution {
-            get {
-                return ((double)(this["Resolution"]));
-            }
-            set {
-                this["Resolution"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5000")]
         public int FocusStopPosition {
             get {
@@ -229,13 +85,13 @@ namespace LensAF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public string IsFirstLaunch {
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int CalibrationLargeSteps {
             get {
-                return ((string)(this["IsFirstLaunch"]));
+                return ((int)(this["CalibrationLargeSteps"]));
             }
             set {
-                this["IsFirstLaunch"] = value;
+                this["CalibrationLargeSteps"] = value;
             }
         }
     }

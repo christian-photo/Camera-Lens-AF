@@ -11,6 +11,7 @@
 
 using EDSDKLib;
 using Nikon;
+using NINA.Core.Utility;
 using NINA.Equipment.Equipment.MyCamera;
 using System;
 using System.Collections.Generic;
@@ -138,17 +139,23 @@ namespace LensAF.Util
 
         public CameraInfo(NikonDevice camera)
         {
+            CameraFirmware = TryGetString(camera, eNkMAIDCapability.kNkMAIDCapability_Firmware, "Unknown");
+            LensName = TryGetString(camera, eNkMAIDCapability.kNkMAIDCapability_LensInfo, "Nikon Lens");
+            CameraName = TryGetString(camera, eNkMAIDCapability.kNkMAIDCapability_Name, "Nikon Camera");
+        }
+
+        private static string TryGetString(NikonDevice camera, eNkMAIDCapability capability, string defaultValue)
+        {
             try
             {
-                CameraFirmware = camera.GetString(eNkMAIDCapability.kNkMAIDCapability_Firmware);
-                LensName = camera.GetString(eNkMAIDCapability.kNkMAIDCapability_LensInfo);
-                CameraName = camera.GetString(eNkMAIDCapability.kNkMAIDCapability_Name);
+                string value = camera.GetString(capability);
+                return value;
             }
-            catch
+            catch (Exception e)
             {
-                CameraFirmware = "Unknown";
-                LensName = "Nikon Lens";
-                CameraName = "Nikon Camera";
+                Logger.Error(e);
+                Logger.Info("Could not get camera info, using default values");
+                return defaultValue;
             }
         }
 

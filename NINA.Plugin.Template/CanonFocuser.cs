@@ -9,7 +9,7 @@
 
 #endregion "copyright"
 
-using Dasync.Collections;
+using CommunityToolkit.Mvvm.Input;
 using EDSDKLib;
 using LensAF.Properties;
 using LensAF.Util;
@@ -17,13 +17,13 @@ using NINA.Core.Utility;
 using NINA.Core.Utility.Notification;
 using NINA.Equipment.Equipment.MyCamera;
 using NINA.Equipment.Interfaces;
-using NINA.Equipment.Interfaces.ViewModel;
-using NINA.Image.Interfaces;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
+using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Navigation;
 using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace LensAF
@@ -63,18 +63,7 @@ namespace LensAF
             }
         }
 
-        private double _stepSize = 1;
-        public double StepSize
-        {
-            get => _stepSize;
-            set
-            {
-                _stepSize = value;
-                Settings.Default.Resolution = value;
-                CoreUtil.SaveSettings(Settings.Default);
-                RaisePropertyChanged();
-            }
-        }
+        public double StepSize { get; } = 1;
 
         private string _name = "Canon Lens Driver";
         public string Name
@@ -111,7 +100,10 @@ namespace LensAF
 
         public IList<string> SupportedActions { get; set; }
 
-        public RelayCommand CalibrateLens { get; set; }
+        public AsyncRelayCommand CalibrateLens { get; set; }
+        public RelayCommand CancelCalibrate { get; set; }
+
+        private CancellationTokenSource calibrationToken;
 
         public string DisplayName { get; set; } = "Canon Lens Driver";
 
@@ -119,43 +111,50 @@ namespace LensAF
         {
             Id = id;
 
-            CalibrateLens = new RelayCommand(async () =>
+            DisplayName = $"Canon Lens Driver ({id})";
+
+            CalibrateLens = new AsyncRelayCommand(async () =>
             {
-                List<string> errors = Utility.Validate(LensAF.Camera);
-                if (errors.Count > 0)
+                if (!ValidateCamera())
                 {
-                    foreach (string error in errors)
-                    {
-                        Notification.ShowError(error);
-                    }
                     return;
                 }
-                IntPtr cam = Utility.GetCamera(LensAF.Camera);
-                CancellationTokenSource token = new CancellationTokenSource();
-                IAsyncEnumerable<IExposureData> data = LensAF.Camera.LiveView(token.Token);
-                IsMoving = true;
-                await data.ForEachAsync(_ =>
+
+                calibrationToken = new CancellationTokenSource();
+
+                try
                 {
-                    for (int i = 0; i < 15; i++)
-                    {
-                        uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far3);
-                        if (error != EDSDK.EDS_ERR_OK)
-                            Logger.Debug(Utility.ErrorCodeToString(error));
-                        Thread.Sleep(100);
-                    }
-                    EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near2);
-                    Thread.Sleep(100);
-                    token.Cancel();
-                });
-                IsMoving = false;
-                int position = Position;
-                Position = Settings.Default.FocusStopPosition;
-                CancellationToken ct = new CancellationToken();
-                IsMoving = true;
-                await Move(position, ct, 1000);
-                IsMoving = false;
+                    await CalibrateCamera(calibrationToken.Token);
+                }
+                catch (OperationCanceledException e)
+                {
+                    Notification.ShowInformation("Calibration canceled");
+                    Logger.Info($"Calibration canceled: {e.Message}");
+                    return;
+                }
+
                 Notification.ShowSuccess("Calibration finished");
             });
+
+            CancelCalibrate = new RelayCommand(() =>
+            {
+                calibrationToken?.Cancel();
+            });
+        }
+
+        private bool ValidateCamera()
+        {
+            List<string> validation = Utility.Validate(LensAF.Camera);
+            if (validation.Count > 0)
+            {
+                foreach (string issue in validation)
+                {
+                    Notification.ShowError(issue);
+                    Logger.Error($"Canon camera validation failed for focus movement: {issue}");
+                }
+                return false;
+            }
+            return true;
         }
 
         public string Action(string actionName, string actionParameters)
@@ -167,19 +166,56 @@ namespace LensAF
         {
             return Task.Run(() =>
             {
-                List<string> errors = Utility.Validate(LensAF.Camera);
-                if (errors.Count > 0)
+                if (!ValidateCamera())
                 {
-                    foreach (string error in errors)
-                    {
-                        Notification.ShowError(error);
-                    }
-                    return Connected;
+                    return false;
                 }
+
+                LensAF.AddLensConfigIfNecessary(DisplayName);
 
                 Connected = true;
                 return Connected;
             });
+        }
+
+        public async Task CalibrateCamera(CancellationToken ct)
+        {
+            IntPtr cam = Utility.GetCamera(LensAF.Camera);
+            EDCamera camera = Utility.GetCanonCamera(LensAF.Camera);
+
+            try
+            {
+                LensAF.AddLensConfigIfNecessary(DisplayName);
+
+                camera.StartLiveView(new NINA.Equipment.Model.CaptureSequence());
+                IsMoving = true;
+
+                for (int i = 0; i < Settings.Default.CalibrationLargeSteps; i++)
+                {
+                    await DriveManualFocus((int)EDSDK.EvfDriveLens_Far3, ct);
+                    ct.ThrowIfCancellationRequested();
+                }
+                await DriveManualFocus((int)EDSDK.EvfDriveLens_Near2, ct);
+                ct.ThrowIfCancellationRequested();
+
+                Position = Settings.Default.FocusStopPosition;
+
+                int focusPosition = LensAF.GetFocusPosition(Name);
+                if (focusPosition > 0)
+                {
+                    await Move(focusPosition, ct);
+                    ct.ThrowIfCancellationRequested();
+                }
+            }
+            catch
+            {
+                camera.StopLiveView();
+                IsMoving = false;
+                throw;
+            }
+
+            camera.StopLiveView();
+            IsMoving = false;
         }
 
         public void Disconnect()
@@ -189,69 +225,65 @@ namespace LensAF
 
         public void Halt()
         {
-            return;
+        }
+
+        private async Task<bool> DriveManualFocus(int direction, CancellationToken? ct = null)
+        {
+            if (!Connected)
+            {
+                throw new Exception("Lens driver not connected");
+            }
+            // Start driving the manual focus motor
+            IntPtr camera = Utility.GetCamera(LensAF.Camera);
+            uint error = EDSDK.EdsSendCommand(camera, EDSDK.CameraCommand_DriveLensEvf, direction);
+
+            if (error != EDSDK.EDS_ERR_OK)
+            {
+                Logger.Debug(Utility.ErrorCodeToString(error));
+                return false;
+            }
+
+            await Task.Delay(100, ct ?? CancellationToken.None);
+
+            return true;
         }
 
         public async Task Move(int position, CancellationToken ct, int waitInMs = 1000)
         {
-            List<string> validation = Utility.Validate(LensAF.Camera);
-            if (validation.Count > 0)
+            if (!ValidateCamera())
             {
-                foreach (string issue in validation)
-                {
-                    Notification.ShowError(issue);
-                    Logger.Error($"Cannot move focus: {issue}");
-                }
+                return;
             }
+
             double diff = Position - position;
-            IntPtr cam = Utility.GetCamera(LensAF.Camera);
-            CancellationTokenSource token = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            EDCamera c = Utility.GetCanonCamera(LensAF.Camera);
+            EDCamera camera = Utility.GetCanonCamera(LensAF.Camera);
 
-            bool wasOn = c.LiveViewEnabled;
-            if (!wasOn)
-                c.StartLiveView(new NINA.Equipment.Model.CaptureSequence());
+            bool wasLiveviewEnabled = camera.LiveViewEnabled;
+            if (!wasLiveviewEnabled)
+                camera.StartLiveView(new NINA.Equipment.Model.CaptureSequence());
 
-            if (diff > 0) // Drive focus near
+            int direction = (int)EDSDK.EvfDriveLens_Near1;
+            if (diff < 0)
             {
-                while (diff > 0)
-                {
-                    uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Near1);
-                    if (error != EDSDK.EDS_ERR_OK)
-                        Logger.Debug(Utility.ErrorCodeToString(error));
-                    try
-                    {
-                        await Task.Delay(100, ct);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        // Expected if cancellation is requested, no need to propagate the exception.
-                    }
-                    diff -= StepSize;
-                }
+                direction = (int)EDSDK.EvfDriveLens_Far1;
+                diff = -diff;
             }
-            else // Drive focus far
+
+            bool ok = true;
+
+            while (diff > 0 && ok)
             {
-                while (diff < 0)
-                {
-                    uint error = EDSDK.EdsSendCommand(cam, EDSDK.CameraCommand_DriveLensEvf, (int)EDSDK.EvfDriveLens_Far1);
-                    if (error != EDSDK.EDS_ERR_OK)
-                        Logger.Debug(Utility.ErrorCodeToString(error));
-                    try
-                    {
-                        await Task.Delay(100, ct);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        // Expected if cancellation is requested, no need to propagate the exception.
-                    }
-                    diff += StepSize;
-                }
+                ok = await DriveManualFocus(direction, ct);
+                diff -= StepSize;
+                Position -= (int)StepSize;
+                ct.ThrowIfCancellationRequested();
             }
+
             Position = position;
-            if (!wasOn)
+
+            if (!wasLiveviewEnabled)
             {
-                c.StopLiveView();
+                camera.StopLiveView();
             }
             return;
         }

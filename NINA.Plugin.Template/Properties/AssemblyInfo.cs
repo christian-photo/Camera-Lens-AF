@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("3.1.0.0")]
-[assembly: AssemblyFileVersion("3.1.0.0")]
+[assembly: AssemblyVersion("3.1.1.0")]
+[assembly: AssemblyFileVersion("3.1.1.0")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -54,7 +54,17 @@ The plugin was tested using the following camera and lenses (Note that there are
 - Canon EOS 600d
 - Canon EF 100-400 f/4.5-5.6 L IS USM
 - Canon EF 24-105 f/4 L IS USM
+- Tamron PZD Di II 16-300mm (on Canon)
+- Tamron Di II VC 18-400mm (on Canon)
+- Canon EF 50mm
+- Canon EFS 18-55mm
+- Canon EFS 18-135mm
 - Nikon Z6 with Nikon Nikkor Z 70-200 f/2.8
+
+The plugin didn't work with the following cameras/lenses:
+- Tamron XR Di II 18-200mm (on Canon)
+
+If you would like to contribute to this list, please open an issue [here](https://github.com/christian-photo/Camera-Lens-AF/issues)
 
 ## Manual Focus Control controls (The Manual Focus Control does not affect the focuser position!)
 - Mousewheel/Trackpad: Zoom in/out

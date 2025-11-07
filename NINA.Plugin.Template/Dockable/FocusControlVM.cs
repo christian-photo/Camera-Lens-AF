@@ -120,7 +120,7 @@ namespace LensAF.Dockable
             MoveRight = new RelayCommand(async () =>
             {
                 moving = true;
-                await focuser.MoveFocuserRelative(2, FocusControlToken.Token);
+                await focuser.MoveFocuserRelative(1, FocusControlToken.Token);
                 moving = false;
             });
 
@@ -134,7 +134,7 @@ namespace LensAF.Dockable
             MoveLeft = new RelayCommand(async () =>
             {
                 moving = true;
-                await focuser.MoveFocuserRelative(-2, FocusControlToken.Token);
+                await focuser.MoveFocuserRelative(-1, FocusControlToken.Token);
                 moving = false;
             });
 

@@ -35,16 +35,113 @@
                     Text="{Binding Blackclipping}" />
                 <TextBlock
                     Margin="10,2,0,0"
-                    Text="  Focus Stop Position:"
+                    Text="Calibration Stop Position:"
                     ToolTip="Fine tune for your Camera/Lens combination. &#x0d;&#x0a;It may take a few iterations to find the best value, but after that it shouldn't change." />
                 <TextBox
                     Width="50"
                     Margin="5,0,0,5"
                     xml:space="preserve"
                     Text="{Binding FocusStopPosition, UpdateSourceTrigger=PropertyChanged}"
-                    ToolTip="The Lens is moved to the Focus Stop, &#x0d;&#x0a;Position is set to this value, &#x0d;&#x0a;the Lens is moved to the Target position. &#x0d;&#x0a;The final position should be near enough to the optimal focus so that AutoFocus can be successful." />
+                    ToolTip="The position that will be set for the camera after calibration" />
+                <TextBlock Margin="10,2,0,0" Text="Large steps to take to reach the edge (Calibration): " />
+                <TextBlock
+                    Width="30"
+                    Margin="2,2,0,0"
+                    Text="{Binding CalibrationLargeSteps}" />
+                <Slider
+                    Width="300"
+                    Height="40"
+                    Margin="5,-10,0,0"
+                    IsSnapToTickEnabled="True"
+                    Maximum="100"
+                    Minimum="0"
+                    TickFrequency="5"
+                    Value="{Binding CalibrationLargeSteps, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
+            <Separator Margin="10,7,10,7" />
+
+            <StackPanel Orientation="Vertical">
+                <TextBlock
+                    FontSize="28"
+                    FontWeight="Bold"
+                    Text="Approximate Focus Positions" />
+                <TextBlock
+                    Width="1000"
+                    HorizontalAlignment="Left"
+                    TextWrapping="Wrap">
+                    Here you can set approximate focus positions for your lenses. Since these will change depending on the focal length (for zoom lenses),<LineBreak />
+                    you also have to specify the matching focal length. This information will be used to move the lens focus close to a good focus immediately after calibration.<LineBreak />
+                    When connecting new lenses, they will be added to the dropdown below. You will still need to configure them manually (focal lengths and focus positions).<LineBreak />
+                    It is important that the focal lengths you set here match with the ones you have set in your profiles, since these will be used to determine the correct focus position.<LineBreak />
+                    <LineBreak />
+                    The process of calibration will look like the following (running automatically):<LineBreak />
+                    1. Move the focus to the infinity focus point<LineBreak />
+                    2. Move the focus back a little bit (This has always been done)<LineBreak />
+                    3. Set the Position to Focus Stop Position<LineBreak />
+                    4. Move the focus to the specified approximate focus position<LineBreak />
+                    4.1 The plugin gets the focal length from the profile and tries to find a matching entry for the currently connected lens in its configuration (table below)<LineBreak />
+                    4.2 If no match was found nothing is done, if there was a match, the focus will be moved to that position<LineBreak />
+                    <LineBreak />
+                    The configuration would work as follows:<LineBreak />
+                    1. Select the lens for which you want to set an approximate focus position from the dropdown menu<LineBreak />
+                    2. Modify the existing entry or add a new one by double clicking on a field in the empty row. You can also delete rows by clicking on them and then pressing delete<LineBreak />
+                    3. Check that the focal length set in your profile with which you use this lens at a given focal length, matches the one you enter here. Otherwise it won't be able to find the approximate focus position</TextBlock>
+                <ComboBox
+                    Width="465"
+                    Margin="10"
+                    HorizontalAlignment="Left"
+                    ItemsSource="{Binding KnownLensesNames}"
+                    SelectedValue="{Binding SelectedLensName}" />
+                <DataGrid
+                    Width="465"
+                    Margin="10"
+                    HorizontalAlignment="Left"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="True"
+                    CanUserDeleteRows="True"
+                    CanUserReorderColumns="False"
+                    CanUserSortColumns="False"
+                    ItemsSource="{Binding CurrentLensConfig.FocusPosition}"
+                    ToolTip="This can be used to set an approximate focus position for every known lens. When you set this to 4990 for example, the lens will automatically move to the position 4990 after calibration to ensure that it is already quite close to optimal focus. 0 disables this">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="200"
+                            Binding="{Binding FocalLength, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Header="Focal Length"
+                            IsReadOnly="False">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn
+                            Width="250"
+                            Binding="{Binding FocusPosition, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Header="Approximate Focus Position"
+                            IsReadOnly="False">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
         </StackPanel>
     </DataTemplate>
 </ResourceDictionary>
