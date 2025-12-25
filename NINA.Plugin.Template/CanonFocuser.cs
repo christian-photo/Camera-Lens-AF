@@ -275,7 +275,7 @@ namespace LensAF
             {
                 ok = await DriveManualFocus(direction, ct);
                 diff -= StepSize;
-                Position -= (int)StepSize;
+                Position -= (int)StepSize * (direction == EDSDK.EvfDriveLens_Far1 ? -1 : 1);
                 ct.ThrowIfCancellationRequested();
             }
 
