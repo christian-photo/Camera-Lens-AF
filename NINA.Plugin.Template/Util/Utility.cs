@@ -146,6 +146,14 @@ namespace LensAF.Util
             {
                 error.Add("No Nikon camera connected");
             }
+            else
+            {
+                IDevice cam = Camera.GetDevice() is PersistSettingsCameraDecorator decorator ? decorator.Camera : Camera.GetDevice();
+                if (cam is not NikonCamera)
+                {
+                    error.Add("No Nikon camera connected with NINA default driver");
+                }
+            }
 
             return error;
         }
