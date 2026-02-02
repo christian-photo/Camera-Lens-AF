@@ -173,9 +173,17 @@ namespace LensAF
 
                 LensAF.AddLensConfigIfNecessary(DisplayName);
 
+                LensAF.Camera.Disconnected += OnCameraDisconnect;
+
                 Connected = true;
                 return Connected;
             });
+        }
+
+        private Task OnCameraDisconnect(object arg1, EventArgs arg2)
+        {
+            if (Connected) this.Disconnect();
+            return Task.CompletedTask;
         }
 
         public async Task CalibrateCamera(CancellationToken ct)
@@ -221,6 +229,7 @@ namespace LensAF
         public void Disconnect()
         {
             Connected = false;
+            LensAF.Camera.Disconnected -= OnCameraDisconnect;
         }
 
         public void Halt()
