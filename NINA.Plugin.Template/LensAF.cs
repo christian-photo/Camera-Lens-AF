@@ -32,11 +32,12 @@ namespace LensAF
     public class LensAF : PluginBase, INotifyPropertyChanged
     {
         private string lensesConfigPath { get => Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "lenses.json"); }
+        private Integration integration;
 
         private static LensAF instance;
 
         [ImportingConstructor]
-        public LensAF(ICameraMediator camera, IProfileService profileService)
+        public LensAF(ICameraMediator camera, IFocuserMediator focuser, IProfileService profileService, IMessageBroker messageBroker)
         {
             instance = this;
             if (Settings.Default.UpdateSettings)
@@ -46,6 +47,7 @@ namespace LensAF
                 CoreUtil.SaveSettings(Settings.Default);
             }
             Camera = camera;
+            Focuser = focuser;
             ProfileService = profileService;
 
             if (File.Exists(lensesConfigPath))
@@ -57,10 +59,13 @@ namespace LensAF
             {
                 KnownLenses = new ObservableCollection<LensConfig>();
             }
+
+            integration = new(messageBroker);
         }
 
         public override Task Teardown()
         {
+            integration.Dispose();
             File.WriteAllText(lensesConfigPath, JsonConvert.SerializeObject(KnownLenses));
             return base.Teardown();
         }
@@ -68,6 +73,7 @@ namespace LensAF
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static ICameraMediator Camera;
+        public static IFocuserMediator Focuser;
         public static IProfileService ProfileService;
 
         public bool PrepareImage
