@@ -93,19 +93,31 @@ namespace LensAF.Dockable
                 IAsyncEnumerable<IExposureData> LiveView = Camera.LiveView(FocusControlToken.Token);
                 ManualFocusControl = true;
 
-                await LiveView.ForEachAsync(async exposure =>
+                try
                 {
-                    IImageData data = await exposure.ToImageData();
-                    if (Settings.Default.PrepareImage)
+                    await LiveView.ForEachAsync(async exposure =>
                     {
-                        IRenderedImage img = data.RenderImage();
-                        Image = (await img.Stretch(Settings.Default.Stretchfactor, Settings.Default.Blackclipping, true)).Image;
-                    }
-                    else
-                    {
-                        Image = data.RenderBitmapSource();
-                    }
-                });
+                        IImageData data = await exposure.ToImageData();
+                        if (Settings.Default.PrepareImage)
+                        {
+                            IRenderedImage img = data.RenderImage();
+                            Image = (await img.Stretch(Settings.Default.Stretchfactor, Settings.Default.Blackclipping, true)).Image;
+                        }
+                        else
+                        {
+                            Image = data.RenderBitmapSource();
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Notification.ShowError(ex.Message);
+                }
+                finally
+                {
+                    ManualFocusControl = false;
+                }
+
             });
 
             StopFocusControl = new RelayCommand(() =>

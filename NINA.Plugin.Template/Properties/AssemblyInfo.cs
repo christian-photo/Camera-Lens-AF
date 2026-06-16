@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 
 // [MANDATORY] The assembly versioning
 //Should be incremented for each new release build of a plugin
-[assembly: AssemblyVersion("3.1.2.1")]
-[assembly: AssemblyFileVersion("3.1.2.1")]
+[assembly: AssemblyVersion("3.1.2.2")]
+[assembly: AssemblyFileVersion("3.1.2.2")]
 
 // [MANDATORY] The name of your plugin
 [assembly: AssemblyTitle("Lens AF")]
@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Christian Palm")]
 // The product name that this plugin is part of
 [assembly: AssemblyProduct("Camera Lens AF")]
-[assembly: AssemblyCopyright("Copyright ©  2025")]
+[assembly: AssemblyCopyright("Copyright ©  2026")]
 
 // The minimum Version of N.I.N.A. that this plugin is compatible with
 [assembly: AssemblyMetadata("MinimumApplicationVersion", "3.2.0.9001")]
