@@ -132,29 +132,72 @@ namespace LensAF.Dockable
             MoveRight = new RelayCommand(async () =>
             {
                 moving = true;
-                await focuser.MoveFocuserRelative(1, FocusControlToken.Token);
-                moving = false;
+                try
+                {
+                    await focuser.MoveFocuserRelative(1, FocusControlToken.Token);
+                }
+                catch (Exception ex)
+                {
+                    Notification.ShowError(ex.Message);
+                }
+                finally
+                {
+                    moving = false;
+                }
+
+
             });
 
             MoveRightBig = new RelayCommand(async () =>
             {
                 moving = true;
-                await focuser.MoveFocuserRelative(10, FocusControlToken.Token);
-                moving = false;
+                try
+                {
+                    await focuser.MoveFocuserRelative(10, FocusControlToken.Token);
+                }
+                catch (Exception ex)
+                {
+                    Notification.ShowError(ex.Message);
+                }
+                finally
+                {
+                    moving = false;
+                }
+
             });
 
             MoveLeft = new RelayCommand(async () =>
             {
                 moving = true;
-                await focuser.MoveFocuserRelative(-1, FocusControlToken.Token);
-                moving = false;
+                try
+                {
+                    await focuser.MoveFocuserRelative(-1, FocusControlToken.Token);
+                }
+                catch (Exception ex)
+                {
+                    Notification.ShowError(ex.Message);
+                }
+                finally
+                {
+                    moving = false;
+                }
             });
 
             MoveLeftBig = new RelayCommand(async () =>
             {
                 moving = true;
-                await focuser.MoveFocuserRelative(-10, FocusControlToken.Token);
-                moving = false;
+                try
+                {
+                    await focuser.MoveFocuserRelative(-10, FocusControlToken.Token);
+                }
+                catch (Exception ex)
+                {
+                    Notification.ShowError(ex.Message);
+                }
+                finally
+                {
+                    moving = false;
+                }
             });
         }
     }
